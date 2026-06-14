@@ -335,9 +335,9 @@ function Navbar({ onBookClick}: {onBookClick: ()=>void}) {
           </span>
         </div>
         <ul className="hidden md:flex items-center gap-8">
-          {["How it works", "What we take", "Our impact"].map((l) => (
-            <li key={l}><a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">{l}</a></li>
-          ))}
+          <li><a href="#how-it-works" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">How it works</a></li>
+          <li><a href="#what-we-take" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">What we take</a></li>
+          <li><a href="#impact" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Our impact</a></li>
         </ul>
         <button onClick={onBookClick} className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
           Schedule pickup
@@ -349,10 +349,12 @@ function Navbar({ onBookClick}: {onBookClick: ()=>void}) {
         </button>
       </div>
       {open && (
-        <div className="md:hidden border-t border-gray-100 px-5 py-4 flex flex-col gap-4 bg-white">
-          {["How it works", "What we take", "Our impact"].map((l) => (
-            <a key={l} href="#" className="text-sm font-medium text-gray-600">{l}</a>
-          ))}
+        // 
+        <div className="md:hidden border-t border-gray-100 px-5 py-4 flex flex-col gap-4 bg-white list-none">
+          <li><a href="#how-it-works" className="text-sm font-medium text-gray-600">How it works</a></li>
+          <li><a href="#what-we-take" className="text-sm font-medium text-gray-600">What we take</a></li>
+          <li><a href="#impact" className="text-sm font-medium text-gray-600">Our impact</a></li>
+          
           <button onClick={onBookClick} className="w-full bg-green-500 text-white text-sm font-semibold py-3 rounded-xl">Schedule pickup</button>
         </div>
       )}
