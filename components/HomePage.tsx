@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react";
+import Navbar from "./NavBar";
+import IconRecycle from "./Icon";
 
 // ── Image imports (update paths to match your project's public/assets folder) ──
 const IMAGES = {
@@ -15,17 +17,7 @@ const IMAGES = {
   homePickUp: "./we-come-u.png"
 };
 
-// ── Inline SVG Icons ──────────────────────────────────────────────────────────
-const IconRecycle = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-    <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5" />
-    <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12" />
-    <path d="m14 16-3 3 3 3" />
-    <path d="M8.293 13.596 7.196 9.5 3.1 10.598" />
-    <path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843" />
-    <path d="m13.378 9.633 4.096 1.098 1.097-4.096" />
-  </svg>
-);
+
 const IconMapPin = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
@@ -61,26 +53,7 @@ const IconChevronRight = () => (
     <path d="m9 18 6-6-6-6" />
   </svg>
 );
-const IconTruck = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-    <path d="M15 18H9" /><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
-    <circle cx="17" cy="18" r="2" /><circle cx="7" cy="18" r="2" />
-  </svg>
-);
-const IconBottle = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-    <path d="M15 11h.01" /><path d="M11 15h.01" /><path d="M16 16h.01" />
-    <path d="m2 2 20 20" />
-    <path d="M20.11 15.11A6 6 0 0 1 9 9.11M15.56 4.44A6 6 0 0 1 21 9.11" />
-    <path d="M3 3a6 6 0 0 0 8.11 8.11" />
-  </svg>
-);
-const IconWrench = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-  </svg>
-);
+
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const STEPS = [
@@ -321,46 +294,7 @@ function Footer() {
 
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
-function Navbar({ onBookClick}: {onBookClick: ()=>void}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-green-500 rounded-xl flex items-center justify-center text-white">
-            <IconRecycle />
-          </div>
-          <span className="text-lg font-extrabold tracking-tight text-gray-900">
-            Scrap<span className="text-green-500">Seva</span>
-          </span>
-        </div>
-        <ul className="hidden md:flex items-center gap-8">
-          <li><a href="#how-it-works" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">How it works</a></li>
-          <li><a href="#what-we-take" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">What we take</a></li>
-          <li><a href="#impact" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Our impact</a></li>
-        </ul>
-        <button onClick={onBookClick} className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
-          Schedule pickup
-        </button>
-        <button className="md:hidden p-2 rounded-lg hover:bg-gray-100" onClick={() => setOpen(!open)}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
-            {open ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
-          </svg>
-        </button>
-      </div>
-      {open && (
-        // 
-        <div className="md:hidden border-t border-gray-100 px-5 py-4 flex flex-col gap-4 bg-white list-none">
-          <li><a href="#how-it-works" className="text-sm font-medium text-gray-600">How it works</a></li>
-          <li><a href="#what-we-take" className="text-sm font-medium text-gray-600">What we take</a></li>
-          <li><a href="#impact" className="text-sm font-medium text-gray-600">Our impact</a></li>
-          
-          <button onClick={onBookClick} className="w-full bg-green-500 text-white text-sm font-semibold py-3 rounded-xl">Schedule pickup</button>
-        </div>
-      )}
-    </nav>
-  );
-}
+
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function Hero({ onBookClick, onLearnClick }: {onBookClick: ()=>void, onLearnClick: ()=> void}) {
@@ -433,11 +367,9 @@ function Hero({ onBookClick, onLearnClick }: {onBookClick: ()=>void, onLearnClic
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const scrollTo = (id: string) => {
-    console.log("pressed"+ id)
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })};
   return (
     <div className="min-h-screen bg-white font-sans antialiased">
-      <Navbar onBookClick={() => scrollTo("book")} />
       <Hero onBookClick={() => scrollTo("book")} onLearnClick={() => scrollTo("how-it-works")} />
       <HowItWorks />
       <WhatWeTake />
