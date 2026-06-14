@@ -170,13 +170,9 @@ function HowItWorks() {
             <div key={i} className="relative bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex flex-col">
               {/* Image or icon visual */}
               <div className="w-full h-48 bg-green-50 flex items-center justify-center overflow-hidden">
-                {step.useIcon ? (
-                  <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-green-500 border border-gray-100 shadow-sm">
-                    {step.icon}
-                  </div>
-                ) : (
+                
                   <img src={step.img} alt={step.imgAlt} className="w-full h-full object-cover" />
-                )}
+              
               </div>
               {/* Card content */}
               <div className="p-6 flex flex-col gap-2 flex-1">
@@ -213,13 +209,8 @@ function WhatWeTake() {
             <div key={i} className={`bg-white rounded-2xl border border-gray-100 ${cat.border} transition-colors flex flex-col overflow-hidden cursor-pointer group`}>
               {/* Image or icon */}
               <div className="h-36 flex items-center justify-center overflow-hidden bg-gray-50">
-                {cat.useIcon ? (
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${cat.iconBg}`}>
-                    {cat.icon}
-                  </div>
-                ) : (
                   <img src={cat.img} alt={cat.imgAlt} className="w-full h-full object-cover" />
-                )}
+                
               </div>
               <div className="p-5 flex flex-col gap-2">
                 <h4 className="text-sm font-bold text-gray-900">{cat.label}</h4>
