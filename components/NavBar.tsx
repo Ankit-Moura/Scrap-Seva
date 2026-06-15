@@ -22,13 +22,13 @@ export default function Navbar() {
           <li><a href="/#what-we-take" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">What we take</a></li>
           <li><a href="/#impact" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Our impact</a></li>
         </ul>
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between align-middle">
             <button className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
           Schedule pickup
         </button>
             <Link className="hidden md:flex flex-row cursor-pointer ml-4.5" href={"auth/register"}>
                 <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
-                <p className=" ml-1 align-text-bottom">Register</p>
+                <p className=" ml-1 translate-y-1">Register</p>
             </Link>
         </div>
         <button className="md:hidden p-2 rounded-lg hover:bg-gray-100" onClick={() => setOpen(!open)}>
@@ -46,7 +46,7 @@ export default function Navbar() {
       transition={{ duration: 0.40, ease: easeInOut }}
       className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
     >
-      <div className="px-5 py-4 flex flex-col gap-4 list-none">
+      <div className="px-5 py-4 flex flex-col gap-4 list-none align-middle">
         <motion.li
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
@@ -74,7 +74,7 @@ export default function Navbar() {
             transition={{ delay: 0.1 }}
             >
                <Link className="flex flex-row cursor-pointer -translate-x-1" href={"auth/register"}>
-                <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
+                <img className="text-green-400 w-6 h-6" src="/user.svg" alt="user-icon" />
                 <p className=" align-text-bottom">Register</p>
             </Link>
             </motion.li>
