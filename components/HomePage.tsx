@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import Navbar from "./NavBar";
+import { motion } from "motion/react";
 import IconRecycle from "./Icon";
 
 // ── Image imports (update paths to match your project's public/assets folder) ──
@@ -312,12 +312,61 @@ function Hero({ onBookClick, onLearnClick }: {onBookClick: ()=>void, onLearnClic
           Book a free home pickup in 60 seconds. We collect your old newspapers, bottles, metal, and e-waste — and make sure every bit gets recycled properly.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
-          <button onClick={onBookClick} className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold text-base px-7 py-4 rounded-xl transition-colors">
+          {/* <button onClick={onBookClick} className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold text-base px-7 py-4 rounded-xl transition-colors">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
               <rect width="18" height="18" x="3" y="4" rx="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
             Book free pickup
-          </button>
+          </button> */}
+          <div className="relative inline-block">
+  <motion.div
+    className="absolute inset-0 rounded-xl bg-green-500"
+    animate={{
+      scale: [1, 1.15, 1],
+      opacity: [0.3, 0, 0.3],
+    }}
+    transition={{
+      duration: 2,
+      repeat: Infinity,
+    }}
+  />
+
+          <motion.button
+          onClick={onBookClick}
+          className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold text-base px-7 py-4 rounded-xl"
+          animate={{
+            scale: [1, 1.03, 1],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            repeatDelay: 1.5,
+          }}
+          whileHover={{
+            scale: 1.05,
+          }}
+          whileTap={{
+            scale: 0.92,
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-5 h-5"
+          >
+            <rect width="18" height="18" x="3" y="4" rx="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+
+          Book Free Pickup
+        </motion.button>
+        </div>
           <button onClick={onLearnClick} className="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-800 font-semibold text-base px-7 py-4 rounded-xl border border-gray-200 transition-colors">
             See how it works
           </button>

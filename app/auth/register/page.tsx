@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 import IconRecycle from "@/components/Icon";
+
+
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 type Step = "details" | "otp";
 
@@ -29,6 +37,8 @@ function useResendTimer(initial = 30) {
 }
 
 export default function RegisterPage() {
+  const [confirmationResult, setConfirmationResult] =
+  useState<ConfirmationResult | null>(null);
   const [step, setStep] = useState<Step>("details");
 
   const [fullName, setFullName] = useState("");
@@ -44,6 +54,26 @@ export default function RegisterPage() {
   const [verified, setVerified] = useState(false);
 
   const { seconds, start } = useResendTimer(30);
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const w = window as any;
+
+  if (!w.recaptchaVerifier) {
+    w.recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {
+        size: "invisible",
+      }
+    );
+
+    w.recaptchaVerifier.render().then(() => {
+      console.log("reCAPTCHA ready");
+    });
+  }
+}, []);
 
   const validateName = () => {
     const regex = /^[A-Za-z ]{3,50}$/;
@@ -79,25 +109,40 @@ export default function RegisterPage() {
     return true;
   };
 
-  const handleDetailsSubmit = async () => {
-    const nameValid = validateName();
-    const phoneValid = validatePhone();
+const handleDetailsSubmit = async () => {
+  const nameValid = validateName();
+  const phoneValid = validatePhone();
 
-    if (!nameValid || !phoneValid) return;
+  if (!nameValid || !phoneValid) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      /*
-      await sendOTP(phone);
-      */
+  try {
+    const w = window as any;
 
-      start();
-      setStep("otp");
-    } finally {
-      setLoading(false);
+    if (!w.recaptchaVerifier) {
+      throw new Error("reCAPTCHA not initialized yet");
     }
-  };
+
+    const verifier = w.recaptchaVerifier;
+
+    const result = await signInWithPhoneNumber(
+      auth,
+      `+91${phone}`,
+      verifier
+    );
+
+    setConfirmationResult(result);
+
+    start();
+    setStep("otp");
+  } catch (error) {
+    console.error(error);
+    setPhoneError("OTP failed. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleOTPChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -112,40 +157,78 @@ export default function RegisterPage() {
     }
   };
 
-  const verifyOTP = async () => {
-    const code = otp.join("");
+ const verifyOTP = async () => {
+  const code = otp.join("");
 
-    if (!/^\d{6}$/.test(code)) {
-      setOtpError("Please enter a valid 6-digit OTP");
-      return;
-    }
+  if (!/^\d{6}$/.test(code)) {
+    setOtpError("Please enter a valid 6-digit OTP");
+    return;
+  }
 
-    setOtpError("");
-    setLoading(true);
+  if (!confirmationResult) {
+    setOtpError("OTP session expired");
+    return;
+  }
 
-    try {
-      /*
-      await verifyOtp(phone, code);
-      */
+  setOtpError("");
+  setLoading(true);
 
-      setVerified(true);
+  try {
+    const result = await confirmationResult.confirm(code);
 
-      setTimeout(() => {
-        console.log("redirect");
-      }, 1200);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const firebaseToken =
+      await result.user.getIdToken();
 
-  const resendOTP = async () => {
-    setOtp(["", "", "", "", "", ""]);
-    start();
+    console.log("Firebase Token:", firebaseToken);
 
     /*
-    await resendOtp(phone);
+      SEND TOKEN TO DJANGO
+
+      await axios.post(
+        "/api/auth/firebase-login",
+        {
+          full_name: fullName,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${firebaseToken}`,
+          },
+        }
+      );
     */
-  };
+
+    setVerified(true);
+
+    setTimeout(() => {
+      console.log("redirect");
+    }, 1200);
+  } catch (error) {
+    console.error(error);
+    setOtpError("Invalid OTP");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const resendOTP = async () => {
+  try {
+    const verifier = (window as any).recaptchaVerifier;
+
+    const result = await signInWithPhoneNumber(
+      auth,
+      `+91${phone}`,
+      verifier
+    );
+
+    setConfirmationResult(result);
+
+    setOtp(["", "", "", "", "", ""]);
+    start();
+  } catch (error) {
+    console.error(error);
+    setOtpError("Failed to resend OTP");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-5 py-10">
@@ -233,6 +316,8 @@ export default function RegisterPage() {
                     <p className="text-red-500 text-sm mt-1">{phoneError}</p>
                   )}
                 </div>
+
+                <div id="recaptcha-container"></div>
 
                 <button
                   onClick={handleDetailsSubmit}
