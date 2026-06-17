@@ -1,425 +1,280 @@
-"use client";
+"use client"
+import React, { useState, useEffect, useRef } from 'react';
+import { auth, googleProvider } from '@/lib/firebase';
+import { signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
+import IconRecycle from '@/components/Icon';
+import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import IconRecycle from "@/components/Icon";
 
 
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase";
 
-type Step = "details" | "otp";
 
-function useResendTimer(initial = 30) {
-  const [seconds, setSeconds] = useState(0);
 
-  useEffect(() => {
-    if (!seconds) return;
+type Step = "phone" | "otp";
 
-    const timer = setInterval(() => {
-      setSeconds((prev) => prev - 1);
-    }, 1000);
+function Register() {
+  const router = useRouter();
 
-    return () => clearInterval(timer);
-  }, [seconds]);
-
-  const start = () => setSeconds(initial);
-
-  return {
-    seconds,
-    start,
-    active: seconds > 0,
-  };
-}
-
-export default function RegisterPage() {
-  const [confirmationResult, setConfirmationResult] =
-  useState<ConfirmationResult | null>(null);
-  const [step, setStep] = useState<Step>("details");
-
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-
-  const [nameError, setNameError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [otpError, setOtpError] = useState("");
-
+  const [step, setStep] = useState<Step>("phone");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const [loading, setLoading] = useState(false);
-  const [verified, setVerified] = useState(false);
+  
+  
 
-  const { seconds, start } = useResendTimer(30);
 
-useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  const w = window as any;
-
-  if (!w.recaptchaVerifier) {
-    w.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      {
-        size: "invisible",
-      }
-    );
-
-    w.recaptchaVerifier.render().then(() => {
-      console.log("reCAPTCHA ready");
-    });
-  }
-}, []);
-
-  const validateName = () => {
-    const regex = /^[A-Za-z ]{3,50}$/;
-
-    if (!fullName.trim()) {
-      setNameError("Full name is required");
-      return false;
+ const initRecaptcha = () => {
+    // If one already exists, kill it first to avoid duplicates
+    if (recaptchaVerifierRef.current) {
+      recaptchaVerifierRef.current.clear();
+      recaptchaVerifierRef.current = null;
+      const container = document.getElementById('recaptcha-container');
+      if (container) container.innerHTML = '';
     }
 
-    if (!regex.test(fullName.trim())) {
-      setNameError("Enter a valid full name");
-      return false;
+    try {
+      recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          console.log("reCAPTCHA solved silently!");
+        },
+        'expired-callback': () => {
+          console.log("reCAPTCHA expired. Recycling instance safely...");
+          // Cleanly call the same function to reset the cycle
+          initRecaptcha();
+        }
+      });
+      console.log("captcha init")
+    } catch (error) {
+      console.error("Failed to initialize reCAPTCHA:", error);
     }
-
-    setNameError("");
-    return true;
   };
+
+  // 2. Setup on initial page mount
+  useEffect(() => {
+    initRecaptcha();
+
+    // Cleanup when the user leaves the page
+    return () => {
+      if (recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current.clear();
+        recaptchaVerifierRef.current = null;
+      }
+    };
+  }, []);
+
+
 
   const validatePhone = () => {
-    const regex = /^[6-9]\d{9}$/;
+    const cleaned = phoneNumber.replace(/\D/g, "");
 
-    if (!phone) {
-      setPhoneError("Mobile number is required");
+    if (!cleaned) {
+      setError("Please enter your mobile number");
       return false;
     }
 
-    if (!regex.test(phone)) {
-      setPhoneError("Enter a valid Indian mobile number");
+    if (!/^[6-9]\d{9}$/.test(cleaned)) {
+      setError("Enter a valid Indian mobile number");
       return false;
     }
 
-    setPhoneError("");
+    setError("");
     return true;
   };
 
-const handleDetailsSubmit = async () => {
-  const nameValid = validateName();
-  const phoneValid = validatePhone();
+  
 
-  if (!nameValid || !phoneValid) return;
-
-  setLoading(true);
-
-  try {
-    const w = window as any;
-
-    if (!w.recaptchaVerifier) {
-      throw new Error("reCAPTCHA not initialized yet");
+  const handleOtpSubmit = (e: React.FormEvent) => {
+    if (!/^\d{6}$/.test(otp)) {
+      setError("OTP must be 6 digits");
+      return;
     }
 
-    const verifier = w.recaptchaVerifier;
+    setError("");
 
-    const result = await signInWithPhoneNumber(
-      auth,
-      `+91${phone}`,
-      verifier
-    );
+    // Verify OTP API
+    console.log("Verifying OTP", otp);
+    handleVerifyOtp(e)
+  };
 
-    setConfirmationResult(result);
+  
+const handleVerifyOtp = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!confirmationResult) {
+    setError("Session expired. Please request a new OTP.");
+    return;
+  }
 
-    start();
-    setStep("otp");
-  } catch (error) {
-    console.error(error);
-    setPhoneError("OTP failed. Try again.");
+  if (otp.length !== 6) {
+    setError("Please enter a valid 6-digit code.");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    // This transmits the OTP to Firebase to validate the handshake
+    const result = await confirmationResult.confirm(otp);
+    
+    // Success! The user is securely authenticated
+    const user = result.user;
+    alert(`Successfully logged in! Phone: ${user.phoneNumber}`);
+    
+    // Redirect your user to the dashboard or home page here
+    router.push('/');
+
+  } catch (error: any) {
+    console.error("OTP Verification Error:", error.message);
+    setError("Invalid verification code. Please try again.");
+    setOtp(''); // Clear input on failure so they can retry
   } finally {
     setLoading(false);
   }
 };
 
-  const handleOTPChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
 
-    const next = [...otp];
-    next[index] = value.slice(-1);
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!recaptchaVerifierRef.current) return;
+    if(!validatePhone) return;
 
-    setOtp(next);
+    try {
+      setLoading(true)
+      const Ph = "+91" + phoneNumber
+      const confirmation = await signInWithPhoneNumber(auth, Ph, recaptchaVerifierRef.current);
+      setConfirmationResult(confirmation);
+      setStep("otp");
 
-    if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`)?.focus();
+    } catch (error: any) {
+      console.error("SMS Send Error:", error.message);
+      // If the handshake fails, wipe the slate clean for another try
+      initRecaptcha();
+    }
+    finally{
+      setLoading(false)
     }
   };
 
- const verifyOTP = async () => {
-  const code = otp.join("");
-
-  if (!/^\d{6}$/.test(code)) {
-    setOtpError("Please enter a valid 6-digit OTP");
-    return;
-  }
-
-  if (!confirmationResult) {
-    setOtpError("OTP session expired");
-    return;
-  }
-
-  setOtpError("");
-  setLoading(true);
-
-  try {
-    const result = await confirmationResult.confirm(code);
-
-    const firebaseToken =
-      await result.user.getIdToken();
-
-    console.log("Firebase Token:", firebaseToken);
-
-    /*
-      SEND TOKEN TO DJANGO
-
-      await axios.post(
-        "/api/auth/firebase-login",
-        {
-          full_name: fullName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${firebaseToken}`,
-          },
-        }
-      );
-    */
-
-    setVerified(true);
-
-    setTimeout(() => {
-      console.log("redirect");
-    }, 1200);
-  } catch (error) {
-    console.error(error);
-    setOtpError("Invalid OTP");
-  } finally {
-    setLoading(false);
-  }
-};
-
-const resendOTP = async () => {
-  try {
-    const verifier = (window as any).recaptchaVerifier;
-
-    const result = await signInWithPhoneNumber(
-      auth,
-      `+91${phone}`,
-      verifier
-    );
-
-    setConfirmationResult(result);
-
-    setOtp(["", "", "", "", "", ""]);
-    start();
-  } catch (error) {
-    console.error(error);
-    setOtpError("Failed to resend OTP");
-  }
-};
-
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-5 py-10">
-      <div className="w-full max-w-md">
-        <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-8">
-          <div className="mb-8">
-             <div className="w-9 h-9 bg-green-500 rounded-xl flex items-center justify-center text-white">
-            <IconRecycle />
-          </div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Join Scrap Seva
-            </h1>
+    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        <div className="rounded-3xl bg-white shadow-lg border border-slate-200 p-6">
+          {step === "phone" ? (
+            <form>
+              <div className="mb-8">
+                <div className='flex flex-row space-x-2 items-center'>
+                  <div className='text-white p-2.5 bg-green-500 w-fit rounded-2xl'><IconRecycle/></div>
+                  <div className='text-xl font-bold'><span>Scrap</span><span className='text-green-500'>Seva</span></div>
+                </div>
 
-            <p className="text-sm text-gray-500 mt-2">
-              Create your account and start booking scrap pickups.
-            </p>
-          </div>
+                <p className="mt-2 text-sm text-slate-500">
+                  Enter your mobile number to continue
+                </p>
+              </div>
 
-          <div className="flex items-center mb-8">
-            <div
-              className={`h-1 flex-1 rounded-full ${
-                step === "details" ? "bg-green-500" : "bg-green-500"
-              }`}
-            />
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Mobile Number
+              </label>
 
-            <div
-              className={`h-1 flex-1 rounded-full ml-2 ${
-                step === "otp" ? "bg-green-500" : "bg-gray-200"
-              }`}
-            />
-          </div>
+              <div className="flex items-center border rounded-xl bg-white overflow-hidden">
+                <div className="px-4 py-3 bg-slate-100 border-r text-slate-600 font-medium">
+                  +91
+                </div>
 
-          <AnimatePresence mode="wait">
-            {step === "details" && (
-              <motion.div
-                key="details"
-                initial={{ opacity: 0, x: 25 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -25 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-5"
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={phoneNumber}
+                  onChange={(e) =>
+                    setPhoneNumber(
+                      e.target.value.replace(/\D/g, "").slice(0, 10)
+                    )
+                  }
+                  placeholder="9876543210"
+                  className="flex-1 px-4 py-3 outline-none"
+                />
+              </div>
+
+              {error && (
+                <p className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              )}
+
+              <button
+                onClick={handleSendOtp}
+                type='submit'
+                disabled={loading}
+                className="mt-6 w-full rounded-xl bg-green-500 text-white py-3.5 font-medium active:scale-[0.98] transition"
               >
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name
-                  </label>
+                Continue
+              </button>
+              <div id='recaptcha-container'></div>
+            </form>
+          ) : (
+            <>
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold text-slate-900">
+                  Verify OTP
+                </h1>
 
-                  <input
-                    value={fullName}
-                    onBlur={validateName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Rahul Sharma"
-                    className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-500"
-                  />
+                <p className="mt-2 text-sm text-slate-500">
+                  OTP sent to +91 {phoneNumber}
+                </p>
+              </div>
 
-                  {nameError && (
-                    <p className="text-red-500 text-sm mt-1">{nameError}</p>
-                  )}
-                </div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Enter OTP
+              </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mobile Number
-                  </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={otp}
+                onChange={(e) =>
+                  setOtp(
+                    e.target.value.replace(/\D/g, "").slice(0, 6)
+                  )
+                }
+                placeholder="123456"
+                className="w-full text-center tracking-[0.5em] border rounded-xl px-4 py-3 outline-none text-lg"
+              />
 
-                  <div className="flex items-center border border-gray-300 rounded-xl px-4">
-                    <span className="mr-3 text-gray-500">+91</span>
+              {error && (
+                <p className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              )}
 
-                    <input
-                      value={phone}
-                      maxLength={10}
-                      inputMode="numeric"
-                      onBlur={validatePhone}
-                      onChange={(e) =>
-                        setPhone(
-                          e.target.value.replace(/\D/g, "").slice(0, 10)
-                        )
-                      }
-                      placeholder="9876543210"
-                      className="flex-1 py-3 outline-none"
-                    />
-                  </div>
-
-                  {phoneError && (
-                    <p className="text-red-500 text-sm mt-1">{phoneError}</p>
-                  )}
-                </div>
-
-                <div id="recaptcha-container"></div>
-
-                <button
-                  onClick={handleDetailsSubmit}
-                  disabled={loading}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition"
-                >
-                  {loading ? "Sending OTP..." : "Send OTP"}
-                </button>
-              </motion.div>
-            )}
-
-            {step === "otp" && (
-              <motion.div
-                key="otp"
-                initial={{ opacity: 0, x: 25 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -25 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6"
+              <button
+                onClick={handleOtpSubmit}
+                disabled={loading}
+                className="mt-6 w-full rounded-xl bg-green-500 text-white py-3.5 font-medium active:scale-[0.98] transition"
               >
-                <div>
-                  <button
-                    onClick={() => setStep("details")}
-                    className="text-sm text-green-600 font-medium"
-                  >
-                    ← Change Number
-                  </button>
+                Verify OTP
+              </button>
 
-                  <h2 className="font-semibold text-lg mt-3">
-                    Verify Mobile Number
-                  </h2>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    OTP sent to +91 {phone}
-                  </p>
-                </div>
-
-                <div className="flex justify-between gap-2">
-                  {otp.map((digit, index) => (
-                    <input
-                      key={index}
-                      id={`otp-${index}`}
-                      value={digit}
-                      maxLength={1}
-                      inputMode="numeric"
-                      onChange={(e) =>
-                        handleOTPChange(index, e.target.value)
-                      }
-                      className="w-12 h-14 rounded-xl border border-gray-300 text-center text-lg font-bold outline-none focus:border-green-500"
-                    />
-                  ))}
-                </div>
-
-                {otpError && (
-                  <p className="text-red-500 text-sm">{otpError}</p>
-                )}
-
-                <button
-                  onClick={verifyOTP}
-                  disabled={loading}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition"
-                >
-                  {loading ? "Verifying..." : "Verify OTP"}
-                </button>
-
-                <div className="text-center">
-                  {seconds > 0 ? (
-                    <p className="text-sm text-gray-500">
-                      Resend OTP in {seconds}s
-                    </p>
-                  ) : (
-                    <button
-                      onClick={resendOTP}
-                      className="text-green-600 font-medium text-sm"
-                    >
-                      Resend OTP
-                    </button>
-                  )}
-                </div>
-
-                {verified && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="bg-green-50 border border-green-200 rounded-xl p-4 text-center"
-                  >
-                    <div className="text-3xl mb-2">✅</div>
-
-                    <p className="font-medium text-green-700">
-                      Mobile Number Verified
-                    </p>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+              <button
+                onClick={() => {
+                  setStep("phone");
+                  setOtp("");
+                  setError("");
+                }}
+                className="mt-3 w-full text-sm text-slate-500"
+              >
+                Change Number
+              </button>
+            </>
+          )}
         </div>
-
-        <p className="text-center text-xs text-gray-400 mt-6">
-          By continuing, you agree to our Terms and Privacy Policy.
-        </p>
       </div>
-    </div>
+    </main>
   );
 }
+
+export default Register;

@@ -26,7 +26,7 @@ export default function Navbar() {
             <button className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
           Schedule pickup
         </button>
-            <Link className="hidden md:flex flex-row cursor-pointer ml-4.5" href={"auth/register"}>
+            <Link className="hidden md:flex flex-row cursor-pointer ml-4.5" href={"/auth/register"}>
                 <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
                 <p className=" ml-1 translate-y-1">Register</p>
             </Link>
