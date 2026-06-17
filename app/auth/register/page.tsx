@@ -121,7 +121,7 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
     
     // Success! The user is securely authenticated
     const user = result.user;
-    alert(`Successfully logged in! Phone: ${user.phoneNumber}`);
+    console.log(`Successfully logged in! Phone: ${user.phoneNumber}`);
     
     // Redirect your user to the dashboard or home page here
     router.push('/');
@@ -139,7 +139,7 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!recaptchaVerifierRef.current) return;
-    if(!validatePhone) return;
+    if(!validatePhone()) return;
 
     try {
       setLoading(true)
@@ -206,13 +206,38 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
               )}
 
               <button
-                onClick={handleSendOtp}
-                type='submit'
-                disabled={loading}
-                className="mt-6 w-full rounded-xl bg-green-500 text-white py-3.5 font-medium active:scale-[0.98] transition"
-              >
-                Continue
-              </button>
+  onClick={handleSendOtp}
+  disabled={loading}
+  className="mt-6 w-full rounded-xl bg-green-500 text-white py-3.5 font-medium active:scale-[0.98] transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+>
+  {loading ? (
+    <>
+      <svg
+        className="h-5 w-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+      Sending...
+    </>
+  ) : (
+    "Send OTP"
+  )}
+</button>
               <div id='recaptcha-container'></div>
             </form>
           ) : (
@@ -252,12 +277,38 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
               )}
 
               <button
-                onClick={handleOtpSubmit}
-                disabled={loading}
-                className="mt-6 w-full rounded-xl bg-green-500 text-white py-3.5 font-medium active:scale-[0.98] transition"
-              >
-                Verify OTP
-              </button>
+  onClick={handleOtpSubmit}
+  disabled={loading}
+  className="mt-6 w-full rounded-xl bg-green-500 text-white py-3.5 font-medium active:scale-[0.98] transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+>
+  {loading ? (
+    <>
+      <svg
+        className="h-5 w-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+      Verifying...
+    </>
+  ) : (
+    "Verify OTP"
+  )}
+</button>
 
               <button
                 onClick={() => {
