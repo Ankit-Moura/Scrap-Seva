@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMemo, useState, ChangeEvent } from "react";
+import { useMemo, useState, ChangeEvent, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -47,7 +47,6 @@ interface FormState {
   images: File[];
   categories: ScrapCategory[];
   weight: string;
-  address: string;
   pincode: string;
   landmark: string;
   pickupDate: string;   
@@ -88,14 +87,13 @@ function ProgressBar({ step }: { step: number }) {
 }
 
 export default function PickUp() {
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [form, setForm] = useState<FormState>({
     images: [],
     categories: [],
     weight: "",
-    address: "",
     pincode: "",
     landmark: "",
     pickupDate: "",
@@ -112,30 +110,28 @@ export default function PickUp() {
   lng: 77.2090,
 });
 
+useEffect(() => {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      setPinLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      });
+      setForm((prev) => ({
+        ...prev,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      }));
+    }
+  );
+}, []);
+
 const { isLoaded } = useJsApiLoader({
   googleMapsApiKey:
     process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
 });
 
-const useCurrentLocation = () => {
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const coords = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
 
-      setPinLocation(coords);
-
-      setForm((prev) => ({
-        ...prev,
-        latitude: coords.lat,
-        longitude: coords.lng,
-      }));
-    },
-    console.error
-  );
-};
 
   const previews = useMemo(
     () => form.images.map((f) => URL.createObjectURL(f)),
@@ -167,19 +163,7 @@ const useCurrentLocation = () => {
     }));
   };
 
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) return;
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setForm((prev) => ({
-          ...prev,
-          address: `${position.coords.latitude}, ${position.coords.longitude}`,
-        }));
-      },
-      console.error
-    );
-  };
 
   const nextStep = () => {
     if (step === 1 && form.images.length === 0) {
@@ -202,7 +186,6 @@ const useCurrentLocation = () => {
   const publishRequest = () => {
     if (
       !form.weight ||
-      !form.address ||
       !form.pincode ||
       !form.pickupDate ||
       !form.timeSlot
@@ -387,27 +370,6 @@ const useCurrentLocation = () => {
                       }
                     />
 
-                    {/* <textarea
-                      placeholder="Full Address"
-                      className="w-full rounded-2xl border p-4 min-h-28"
-                      value={form.address}
-                      onChange={(e) =>
-                        setForm((p) => ({
-                          ...p,
-                          address: e.target.value,
-                        }))
-                      }
-                    />
-
-                    <button
-                      type="button"
-                      onClick={getCurrentLocation}
-                      className="flex items-center gap-2 text-green-600"
-                    >
-                      <MapPin size={18} />
-                      Use Current Location
-                    </button> */}
-
                     <div className="rounded-3xl bg-white border border-gray-200 p-4 shadow-sm mb-4">
   <div className="flex items-center justify-between">
     <div>
@@ -416,17 +378,10 @@ const useCurrentLocation = () => {
       </h3>
 
       <p className="text-sm text-gray-500">
-        Tap anywhere on the map to drop a pin
+        {`${form.latitude?`${form.latitude}, ${form.longitude}`:"Tap anywhere on the map to drop a pin"}`}
       </p>
     </div>
-
-    <button
-      type="button"
-      onClick={useCurrentLocation}
-      className="px-4 py-2 rounded-xl bg-green-100 text-green-700"
-    >
-      Use Current Location
-    </button>
+    
   </div>
 </div>
 
@@ -487,6 +442,7 @@ const useCurrentLocation = () => {
   </div>
 )}
 
+                   
                     <input
                       placeholder="Pincode"
                       className="w-full rounded-2xl border p-4"
