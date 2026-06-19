@@ -23,11 +23,20 @@ import { CalendarDays } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
+import { useAuthStore } from "@/store/authStore";
+
 import {
   GoogleMap,
   Marker,
   useJsApiLoader,
 } from "@react-google-maps/api";
+
+import { db } from "@/lib/firebase";
+import { PickupRequestSchema, PickupRequestInput } from "@/schemas/pickup.Schema";
+import {
+  addDoc,
+  collection,
+} from "firebase/firestore";
 
 type ScrapCategory =
   | "paper"
@@ -87,20 +96,32 @@ function ProgressBar({ step }: { step: number }) {
 }
 
 export default function PickUp() {
+    const user = useAuthStore((state) => state.user);
   const [step, setStep] = useState(1);
+const [images, setImages] = useState<File[]>([]);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [form, setForm] = useState<FormState>({
-    images: [],
-    categories: [],
-    weight: "",
-    pincode: "",
-    landmark: "",
-    pickupDate: "",
-    timeSlot: "",
-    latitude: null,
-    longitude: null,
-  });
+  const [form, setForm] = useState<PickupRequestInput>({
+  customer_uid: user?.uid ?? "",
+  customer_name: user?.displayName??"",
+  customer_phone: user?.phoneNumber??"",
+  categories: [],
+  image_urls: [],
+  weight: "",
+  address: "",
+  pincode: "",
+  landmark: "",
+  latitude: 0,
+  longitude: 0,
+  pickup_date: "",
+  time_slot: "9 AM - 12 PM",
+  status: "pending",
+});
+
+
+    useEffect(() => {
+  console.log("FORM STATE:", form);
+}, [form]);
 
   const [pinLocation, setPinLocation] = useState<{
   lat: number;
@@ -134,25 +155,22 @@ const { isLoaded } = useJsApiLoader({
 
 
   const previews = useMemo(
-    () => form.images.map((f) => URL.createObjectURL(f)),
-    [form.images]
+    () => images.map((f) => URL.createObjectURL(f)),
+    [images]
   );
 
-  const handleImages = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).slice(0, 5);
+ const handleImages = (e: ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(e.target.files || []).slice(0, 5);
 
-    setForm((prev) => ({
-      ...prev,
-      images: [...prev.images, ...files].slice(0, 5),
-    }));
-  };
+  setImages((prev) => {
+    const merged = [...prev, ...files];
+    return merged.slice(0, 5);
+  });
+};
 
   const removeImage = (index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-  };
+  setImages((prev) => prev.filter((_, i) => i !== index));
+};
 
   const toggleCategory = (category: ScrapCategory) => {
     setForm((prev) => ({
@@ -166,7 +184,7 @@ const { isLoaded } = useJsApiLoader({
 
 
   const nextStep = () => {
-    if (step === 1 && form.images.length === 0) {
+    if (step === 1 && images.length === 0) {
       alert("Please upload at least one image.");
       return;
     }
@@ -183,19 +201,21 @@ const { isLoaded } = useJsApiLoader({
     setStep(prev=>prev-1)
   }
 
-  const publishRequest = () => {
-    if (
-      !form.weight ||
-      !form.pincode ||
-      !form.pickupDate ||
-      !form.timeSlot
-    ) {
-      alert("Please fill all required fields.");
-      return;
-    }
+  const publishRequest = async() => {
+    try{
+    const validatedData =
+  PickupRequestSchema.parse(form);
+
+    await addDoc(
+    collection(db, "pickup_requests"),
+    validatedData
+    );
 
     console.log(form);
-    alert("Pickup request published successfully.");
+    alert("Pickup request published successfully.");}
+    catch(err){
+        console.log("err in firestore", err)
+    }
   };
 
   return (
@@ -359,6 +379,7 @@ const { isLoaded } = useJsApiLoader({
 
                   <div className="space-y-4 mt-6">
                     <input
+                    
                       placeholder="Estimated Weight (kg)"
                       className="w-full rounded-2xl border p-4"
                       value={form.weight}
@@ -466,7 +487,7 @@ const { isLoaded } = useJsApiLoader({
                         }))
                       }
                     />
-
+                  
                     <div className="relative">
   <button
     type="button"
@@ -499,7 +520,7 @@ const { isLoaded } = useJsApiLoader({
 
             setForm((prev) => ({
               ...prev,
-              pickupDate: date?.toISOString() ?? "",
+              pickup_date: date?.toISOString() ?? "",
             }));
           }}
           disabled={{
@@ -523,11 +544,11 @@ const { isLoaded } = useJsApiLoader({
                             onClick={() =>
                               setForm((p) => ({
                                 ...p,
-                                timeSlot: slot,
+                                time_slot: slot,
                               }))
                             }
                             className={`rounded-2xl border p-4 text-left ${
-                              form.timeSlot === slot
+                              form.time_slot === slot
                                 ? "bg-green-100 border-green-400"
                                 : ""
                             }`}
