@@ -4,7 +4,9 @@ import { auth, googleProvider } from '@/lib/firebase';
 import { signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
 import IconRecycle from '@/components/Icon';
 import { useRouter } from "next/navigation";
+import { updateProfile } from "firebase/auth";
 
+import { useAuthStore } from '@/store/authStore';
 
 
 
@@ -14,9 +16,11 @@ type Step = "phone" | "otp";
 
 function Register() {
   const router = useRouter();
+  const {user} = useAuthStore()
 
   const [step, setStep] = useState<Step>("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [name, setName] = useState("");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -55,6 +59,7 @@ function Register() {
 
   // 2. Setup on initial page mount
   useEffect(() => {
+    
     initRecaptcha();
 
     // Cleanup when the user leaves the page
@@ -70,7 +75,10 @@ function Register() {
 
   const validatePhone = () => {
     const cleaned = phoneNumber.replace(/\D/g, "");
-
+    if (name.length <= 3){
+      setError("Enter a longer than 3 characters");
+      return false;
+    }
     if (!cleaned) {
       setError("Please enter your mobile number");
       return false;
@@ -122,6 +130,12 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
     // Success! The user is securely authenticated
     const user = result.user;
     console.log(`Successfully logged in! Phone: ${user.phoneNumber}`);
+    await updateProfile(
+  result.user,
+  {
+    displayName: name,
+  }
+);
     
     // Redirect your user to the dashboard or home page here
     router.push('/');
@@ -158,6 +172,15 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
     }
   };
 
+
+  if(user){
+    return <>
+    <div>{user.displayName} logged in</div>
+    <div>{user.phoneNumber}</div>
+    <div>{user.getIdToken()}</div>
+    </>
+  }
+
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
@@ -171,9 +194,20 @@ const handleVerifyOtp = async (e: React.FormEvent) => {
                 </div>
 
                 <p className="mt-2 text-sm text-slate-500">
-                  Enter your mobile number to continue
+                  Enter your Details to continue
                 </p>
               </div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Name
+              </label>
+               <input
+    type="text"
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+    placeholder="Eg. Rakesh Kumar"
+    maxLength={50}
+    className="w-full px-4 py-3 rounded-xl border border-black bg-white text-slate-700 outline-none mb-3"
+  />
 
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Mobile Number
