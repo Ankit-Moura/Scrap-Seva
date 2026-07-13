@@ -1,20 +1,50 @@
 // store/authStore.ts
 
 import { create } from "zustand";
-import { User } from "firebase/auth";
+import { persist } from "zustand/middleware";
 
-interface AuthState {
-  user: User | null;
-  loading: boolean;
-
-  setUser: (user: User | null) => void;
-  setLoading: (loading: boolean) => void;
+export interface AuthUser {
+  id: string;
+  phone_number: string;
+  username: string | null;
+  email: string | null;
+  phone_verified: boolean;
+  created_at: string;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  loading: true,
+interface Tokens {
+  access: string;
+  refresh: string;
+}
 
-  setUser: (user) => set({ user }),
-  setLoading: (loading) => set({ loading }),
-}));
+interface AuthState {
+  user: AuthUser | null;
+  tokens: Tokens | null;
+  loading: boolean;
+
+  setUser: (user: AuthUser | null) => void;
+  setTokens: (tokens: Tokens | null) => void;
+  setLoading: (loading: boolean) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      tokens: null,
+      loading: true,
+
+      setUser: (user) => set({ user }),
+      setTokens: (tokens) => set({ tokens }),
+      setLoading: (loading) => set({ loading }),
+
+      logout: () => set({ user: null, tokens: null }),
+    }),
+    {
+      name: "scrapseva-auth", // localStorage key
+      partialize: (state) => ({ user: state.user, tokens: state.tokens }), // don't persist `loading`
+      skipHydration: true,
+    }
+  )
+);

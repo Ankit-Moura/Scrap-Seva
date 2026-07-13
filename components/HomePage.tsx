@@ -133,6 +133,8 @@ const IMPACT = [
 
 // ── How It Works ──────────────────────────────────────────────────────────────
 function HowItWorks() {
+
+  
   return (
     <section id="how-it-works" className="border-t border-gray-100 py-16 sm:py-20">
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
