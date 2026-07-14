@@ -6,11 +6,9 @@ import IconRecycle from "./Icon";
 import Link from "next/link";
 
 import { useAuthStore } from "@/store/authStore";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 
 export default function Navbar() {
-  const user = useAuthStore((state) => state.user);
+  const { logout, user } = useAuthStore();
   const [open, setOpen] = useState(false);
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
@@ -32,12 +30,12 @@ export default function Navbar() {
             <button className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
           Schedule pickup
         </button>
-            {user?<button onClick={()=>signOut(auth)} className="hidden md:flex flex-row cursor-pointer ml-4.5">
+            {user?<button onClick={()=>logout()} className="hidden md:flex flex-row cursor-pointer ml-4.5">
                 <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
                 <p className=" ml-1 translate-y-1">Sign Out</p>
             </button>:<Link className="hidden md:flex flex-row cursor-pointer ml-4.5" href={"/auth/register"}>
                 <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
-                <p className=" ml-1 translate-y-1">Register</p>
+                <p className=" ml-1 translate-y-1">Sign In</p>
             </Link>}
         </div>
         <button className="md:hidden p-2 rounded-lg hover:bg-gray-100" onClick={() => setOpen(!open)}>

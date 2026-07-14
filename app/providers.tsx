@@ -16,16 +16,16 @@ export function AuthHydrator({ children }: { children: React.ReactNode }) {
 
       const state = useAuthStore.getState();
 
-      console.log("provider effect is running")
+      
 
       if (state.tokens?.access) {
         try {
-          console.log("access token exists: ", state.tokens?.access)
+          
           const res = await axios.get(`${API_BASE}/users/me/`, {
             headers: { Authorization: `Bearer ${state.tokens.access}` },
           });
           const data = await JSON.stringify(res.data)
-          console.log("User fetched:", data);
+          
           setUser(res.data);
         } catch (err) {
           console.error("Failed to fetch user, clearing session", err);
