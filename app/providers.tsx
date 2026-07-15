@@ -24,7 +24,7 @@ export function AuthHydrator({ children }: { children: React.ReactNode }) {
           const res = await axios.get(`${API_BASE}/users/me/`, {
             headers: { Authorization: `Bearer ${state.tokens.access}` },
           });
-          const data = await JSON.stringify(res.data)
+          
           
           setUser(res.data);
         } catch (err) {
