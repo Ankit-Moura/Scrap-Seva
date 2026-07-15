@@ -315,7 +315,7 @@ function Hero({ onBookClick, onLearnClick }: {onBookClick: ()=>void, onLearnClic
           Book a free home pickup in 60 seconds. We collect your old newspapers, bottles, metal, and e-waste — and make sure every bit gets recycled properly.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
-          <Link href={"/pickup"}  onClick={onBookClick} className="cursor-pointer flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold text-base px-7 py-4 rounded-xl transition-colors">
+          <Link href={"/book-pickup"}  onClick={onBookClick} className="cursor-pointer flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold text-base px-7 py-4 rounded-xl transition-colors">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
               <rect width="18" height="18" x="3" y="4" rx="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>

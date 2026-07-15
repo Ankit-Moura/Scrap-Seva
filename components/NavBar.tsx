@@ -22,12 +22,14 @@ export default function Navbar() {
           </span>
         </Link>
         <ul className="hidden md:flex items-center gap-8">
-          <li><a href="/#how-it-works" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">How it works</a></li>
-          <li><a href="/#what-we-take" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">What we take</a></li>
-          <li><a href="/#impact" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Our impact</a></li>
+          {user && <Link href="/pickups" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">My Pickups</Link>}
+          <li><Link href="/how-it-works" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">How it works</Link></li>
+          <Link href="/market-rates" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Rates & Categories</Link>
+          <li><Link href="/contact-us" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Contact Us</Link></li>
         </ul>
         <div className="flex flex-row justify-between align-middle">
-            <Link href={"/pickup"} className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors cursor-pointer">
+          
+            <Link href={"/book-pickup"} className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors cursor-pointer">
           Schedule pickup
         </Link>
             {user?<Link href={"/profile"} className="hidden md:flex flex-row cursor-pointer ml-4.5">
@@ -76,29 +78,38 @@ export default function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             >
-        <Link href={"/pickup"}  onClick={() => {
+
+        <Link href={"/book-pickup"}  onClick={() => {
     setOpen(false)
   }} className="w-full text-green-500 font-semibold text-sm  py-3 rounded-xl">Schedule pickup</Link></motion.li>
+
+   {user && <motion.li
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            >
+                <Link href="/pickups"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">My pickups</Link>
+            </motion.li>}
         <motion.li
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             >
-                <a href="#how-it-works"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">How it works</a>
+                <Link href="/how-it-works"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">How it works</Link>
             </motion.li>
         <motion.li
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             >
-                <a href="#what-we-take"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">What we take</a>
+                <Link href="/market-rates"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">Rates & Categories</Link>
             </motion.li>
         <motion.li
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             >
-                <a href="#impact"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">Our impact</a>
+                <a href="/contact-us"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">Contact Us</a>
             </motion.li>
         
           

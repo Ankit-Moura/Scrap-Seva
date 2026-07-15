@@ -5,6 +5,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
+import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
@@ -511,12 +513,37 @@ function AddAddressForm({ onAdd, onCancel }: { onAdd: (data: any) => Promise<voi
 
 /* ---------- Page ---------- */
 export default function ProfilePage() {
+
   const headers = useAuthHeader();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
     const [addresses, setAddresses] = useState<AddressItem[]>([]);
   const [addingAddress, setAddingAddress] = useState(false);
+  const {logout} = useAuthStore();
+  const [balance, setBalance] = useState<number | null>(null);
+
+  const router = useRouter();
+
+const handleLogout = () => {
+  logout();
+  router.replace("/");
+};
+
+
+
+  useEffect(() => {
+  const fetchBalance = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/wallet/`, { headers });
+      setBalance(parseFloat(res.data.balance));
+    } catch (err) {
+      console.error("Failed to fetch wallet balance:", err);
+    }
+  };
+
+  fetchBalance();
+}, []);
 
 
 
@@ -615,20 +642,45 @@ export default function ProfilePage() {
         className="mx-auto max-w-xl"
       >
         {/* Header */}
-        <div className="mb-8 flex items-center gap-5">
-          <TrustRing profile={profile} />
-          <div>
-            <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">
-              {profile.username || "Your profile"}
-            </h1>
-            <p className="mt-1 text-sm text-[#8A8375]">
-              Member since {formatMemberSince(profile.created_at)}
-            </p>
-            <span className="mt-2 inline-flex items-center rounded-full bg-[#228B57]/10 px-2.5 py-1 text-xs font-medium text-[#228B57]">
-              {entityLabel}
-            </span>
-          </div>
+        {/* Header */}
+<div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+  {/* Left Section */}
+  <div className="flex items-center gap-5">
+    <TrustRing profile={profile} />
+
+    <div>
+      <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">
+        {profile.username || "Your profile"}
+      </h1>
+
+      <p className="mt-1 text-sm text-[#8A8375]">
+        Member since {formatMemberSince(profile.created_at)}
+      </p>
+
+      <span className="mt-2 inline-flex items-center rounded-full bg-[#228B57]/10 px-2.5 py-1 text-xs font-medium text-[#228B57]">
+        {entityLabel}
+      </span>
+    </div>
+  </div>
+
+  {/* Wallet Balance */}
+  <div className="w-full sm:w-auto">
+    <div className="rounded-2xl border border-[#E8E2D6] bg-gradient-to-br from-[#FFFDF8] to-[#F8F5EE] px-5 py-4 shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex items-center justify-between gap-6 sm:flex-col sm:items-end sm:gap-1">
+        <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#8A8375]">
+          Wallet Balance
+        </span>
+
+        <div className="flex items-baseline gap-1">
+          <span className="text-lg font-semibold text-[#228B57]">₹</span>
+          <span className="font-serif text-3xl font-bold leading-none text-[#2B2B24]">
+            {balance}
+          </span>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Identity card */}
         <motion.section
@@ -752,7 +804,38 @@ export default function ProfilePage() {
             </AnimatePresence>
           </div>
         </motion.section>
+
+
+        <motion.div
+  initial={{ opacity: 0, y: 12 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.35, ease: "easeOut" }}
+  className="mt-10 rounded-2xl border border-[#E8E2D6] bg-[#FFFDF8] p-5 shadow-sm"
+>
+  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h3 className="font-serif text-lg text-[#2B2B24]">
+        Account
+      </h3>
+      <p className="mt-1 text-sm text-[#8A8375]">
+        Sign out of your account on this device.
+      </p>
+    </div>
+
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
+      onClick={()=>handleLogout()}
+      className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200"
+    >
+      <LogOut className="mr-2 h-4 w-4" />
+      Logout
+    </motion.button>
+  </div>
+</motion.div>
       </motion.div>
+
+
     </main>
   );
 }
