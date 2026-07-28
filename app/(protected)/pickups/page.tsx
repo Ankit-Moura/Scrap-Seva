@@ -31,6 +31,47 @@ interface PickupRequest {
 }
 
 type FilterTab = "active" | "completed" | "cancelled";
+type SlotKey = "morning" | "afternoon" | "evening";
+
+/* ---------- Slot config (IST) ---------- */
+const SLOT_DEFS: Record<SlotKey, { label: string; startHour: number; endHour: number }> = {
+  morning: { label: "9 AM – 12 PM", startHour: 9, endHour: 12 },
+  afternoon: { label: "1 PM – 4 PM", startHour: 13, endHour: 16 },
+  evening: { label: "5 PM – 9 PM", startHour: 17, endHour: 21 },
+};
+const SLOT_ORDER: SlotKey[] = ["morning", "afternoon", "evening"];
+
+// Assumes the browser is running in IST (true for the target India user base).
+// If that ever stops holding, compute "now" via a proper IST-aware library instead.
+function getAvailableDates(): Date[] {
+  const dates: Date[] = [];
+  const now = new Date();
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function isSameDay(a: Date, b: Date) {
+  return a.toDateString() === b.toDateString();
+}
+
+// Disable a slot if its start time has already arrived/passed today.
+function isSlotDisabled(date: Date, slotKey: SlotKey) {
+  const now = new Date();
+  if (!isSameDay(date, now)) return false;
+  return now.getHours() >= SLOT_DEFS[slotKey].startHour;
+}
+
+// Build the UTC ISO string for a chosen date + slot, anchored to IST (+05:30).
+function slotToUTCISOString(date: Date, slotKey: SlotKey) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  const hour = String(SLOT_DEFS[slotKey].startHour).padStart(2, "0");
+  return new Date(`${y}-${m}-${d}T${hour}:00:00+05:30`).toISOString();
+}
 
 /* ---------- Status config ---------- */
 const STATUS_CONFIG: Record<
@@ -121,22 +162,112 @@ function EmptyState({ tab }: { tab: FilterTab }) {
   );
 }
 
+/* ---------- Reschedule panel ---------- */
+function ReschedulePanel({
+  onConfirm,
+  onCancel,
+  saving,
+}: {
+  onConfirm: (iso: string) => Promise<void>;
+  onCancel: () => void;
+  saving: boolean;
+}) {
+  const dates = useMemo(() => getAvailableDates(), []);
+  const [selectedDate, setSelectedDate] = useState<Date>(dates[0]);
+  const [selectedSlot, setSelectedSlot] = useState<SlotKey | null>(null);
+
+  const handleConfirm = () => {
+    if (!selectedSlot) return;
+    onConfirm(slotToUTCISOString(selectedDate, selectedSlot));
+  };
+
+  return (
+    <div className="mt-3 rounded-xl bg-[#F4F1EA] p-3">
+      <p className="mb-2 text-xs font-medium text-[#5B6355]">Pick a new date</p>
+      <div className="flex gap-1.5 overflow-x-auto pb-1">
+        {dates.map((d) => {
+          const active = isSameDay(d, selectedDate);
+          return (
+            <button
+              key={d.toDateString()}
+              onClick={() => {
+                setSelectedDate(d);
+                setSelectedSlot(null);
+              }}
+              className={`shrink-0 rounded-lg px-3 py-2 text-xs font-medium ${
+                active ? "bg-[#228B57] text-white" : "bg-white text-[#2B2B24] border border-[#EBE6DA]"
+              }`}
+            >
+              {d.toLocaleDateString("en-IN", { weekday: "short" })}
+              <br />
+              {d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="mb-2 mt-3 text-xs font-medium text-[#5B6355]">Pick a time slot</p>
+      <div className="flex flex-col gap-1.5">
+        {SLOT_ORDER.map((key) => {
+          const disabled = isSlotDisabled(selectedDate, key);
+          const active = selectedSlot === key;
+          return (
+            <button
+              key={key}
+              disabled={disabled}
+              onClick={() => setSelectedSlot(key)}
+              className={`rounded-lg px-3 py-2 text-left text-xs font-medium ${
+                disabled
+                  ? "cursor-not-allowed bg-white text-[#D8D2C2] border border-[#EBE6DA]"
+                  : active
+                  ? "bg-[#228B57] text-white"
+                  : "bg-white text-[#2B2B24] border border-[#EBE6DA]"
+              }`}
+            >
+              {SLOT_DEFS[key].label}
+              {disabled && <span className="ml-1 text-[10px]">(passed)</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-3 flex justify-end gap-2">
+        <button onClick={onCancel} className="text-xs text-[#8A8375]">
+          Never mind
+        </button>
+        <button
+          onClick={handleConfirm}
+          disabled={!selectedSlot || saving}
+          className="rounded-lg bg-[#228B57] px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Confirm slot"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ---------- Pickup card ---------- */
 function PickupCard({
   pickup,
   onCancel,
+  onReschedule,
 }: {
   pickup: PickupRequest;
   onCancel: (id: string, reason: string) => Promise<void>;
+  onReschedule: (id: string, isoUTC: string) => Promise<void>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
+  const [rescheduling, setRescheduling] = useState(false);
 
   const config = STATUS_CONFIG[pickup.status];
   const StatusIcon = Icons[config.icon] as React.ElementType;
   const total = estimatedTotal(pickup.items);
   const canCancel = pickup.status === "pending" || pickup.status === "accepted";
+  const canReschedule = pickup.status === "pending" || pickup.status === "accepted";
 
   const handleCancel = async () => {
     setCancelling(true);
@@ -145,6 +276,16 @@ function PickupCard({
     } finally {
       setCancelling(false);
       setShowCancelConfirm(false);
+    }
+  };
+
+  const handleReschedule = async (iso: string) => {
+    setRescheduling(true);
+    try {
+      await onReschedule(pickup.id, iso);
+      setShowReschedule(false);
+    } finally {
+      setRescheduling(false);
     }
   };
 
@@ -225,34 +366,51 @@ function PickupCard({
                 </p>
               )}
 
-              {canCancel && (
-                <div className="mt-3">
-                  {showCancelConfirm ? (
-                    <div className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2.5">
-                      <span className="flex-1 text-xs text-red-700">Cancel this pickup?</span>
-                      <button
-                        onClick={handleCancel}
-                        disabled={cancelling}
-                        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
-                      >
-                        {cancelling ? "..." : "Yes, cancel"}
-                      </button>
-                      <button
-                        onClick={() => setShowCancelConfirm(false)}
-                        className="text-xs text-[#8A8375]"
-                      >
-                        Keep it
-                      </button>
-                    </div>
-                  ) : (
+              {(canCancel || canReschedule) && !showReschedule && (
+                <div className="mt-3 flex items-center gap-4">
+                  {canReschedule && (
                     <button
-                      onClick={() => setShowCancelConfirm(true)}
-                      className="text-xs font-medium text-red-500 hover:underline"
+                      onClick={() => setShowReschedule(true)}
+                      className="text-xs font-medium text-[#228B57] hover:underline"
                     >
-                      Cancel pickup
+                      Change slot
                     </button>
                   )}
+                  {canCancel &&
+                    (showCancelConfirm ? (
+                      <div className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2.5">
+                        <span className="flex-1 text-xs text-red-700">Cancel this pickup?</span>
+                        <button
+                          onClick={handleCancel}
+                          disabled={cancelling}
+                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {cancelling ? "..." : "Yes, cancel"}
+                        </button>
+                        <button
+                          onClick={() => setShowCancelConfirm(false)}
+                          className="text-xs text-[#8A8375]"
+                        >
+                          Keep it
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowCancelConfirm(true)}
+                        className="text-xs font-medium text-red-500 hover:underline"
+                      >
+                        Cancel pickup
+                      </button>
+                    ))}
                 </div>
+              )}
+
+              {showReschedule && (
+                <ReschedulePanel
+                  onConfirm={handleReschedule}
+                  onCancel={() => setShowReschedule(false)}
+                  saving={rescheduling}
+                />
               )}
             </div>
           </motion.div>
@@ -292,6 +450,15 @@ export default function MyPickupsPage() {
     const res = await axios.patch(
       `${API_BASE}/pickup-requests/${id}/cancel/`,
       { reason },
+      { headers }
+    );
+    setPickups((prev) => prev.map((p) => (p.id === id ? res.data : p)));
+  };
+
+  const handleReschedule = async (id: string, isoUTC: string) => {
+    const res = await axios.patch(
+      `${API_BASE}/pickup-requests/${id}/`,
+      { scheduled_slot: isoUTC },
       { headers }
     );
     setPickups((prev) => prev.map((p) => (p.id === id ? res.data : p)));
@@ -373,7 +540,12 @@ export default function MyPickupsPage() {
           <div className="space-y-3">
             <AnimatePresence>
               {filtered.map((pickup) => (
-                <PickupCard key={pickup.id} pickup={pickup} onCancel={handleCancel} />
+                <PickupCard
+                  key={pickup.id}
+                  pickup={pickup}
+                  onCancel={handleCancel}
+                  onReschedule={handleReschedule}
+                />
               ))}
             </AnimatePresence>
           </div>
