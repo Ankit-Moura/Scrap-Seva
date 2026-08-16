@@ -7,7 +7,7 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+import Link from "next/link";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 interface Profile {
@@ -72,12 +72,12 @@ function TrustRing({ profile }: { profile: Profile }) {
       <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
         <circle
           cx="50" cy="50" r={radius}
-          className="stroke-[#EBE6DA]"
+          className="stroke-(--color-line)"
           strokeWidth="6" fill="none"
         />
         <motion.circle
           cx="50" cy="50" r={radius}
-          stroke="#228B57"
+          stroke="var(--color-primary)"
           strokeWidth="6" fill="none"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -86,7 +86,7 @@ function TrustRing({ profile }: { profile: Profile }) {
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
         />
       </svg>
-      <div className="absolute inset-2 flex items-center justify-center rounded-full bg-[#228B57] text-white">
+      <div className="absolute inset-2 flex items-center justify-center rounded-full bg-(--color-primary) text-white">
         <span className="font-serif text-2xl tracking-tight">{initials(profile)}</span>
       </div>
       {profile.phone_verified && (
@@ -94,7 +94,7 @@ function TrustRing({ profile }: { profile: Profile }) {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 1.1, type: "spring", stiffness: 300, damping: 15 }}
-          className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-[#E8A33D] ring-4 ring-[#FAF8F3]"
+          className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-(--color-primary-light) ring-4 ring-(--color-bg)"
         >
           <svg viewBox="0 0 20 20" className="h-4 w-4 fill-white">
             <path d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0L3.3 9.7a1 1 0 111.4-1.4l3.8 3.8 6.8-6.8a1 1 0 011.4 0z" />
@@ -150,9 +150,9 @@ function EditableField({
   };
 
   return (
-    <div className="border-b border-[#EBE6DA] py-4 last:border-none">
+    <div className="border-b border-(--color-line) py-4 last:border-none">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-medium uppercase tracking-wide text-[#8A8375]">
+        <span className="text-xs font-medium uppercase tracking-wide text-(--color-ink-soft)">
           {label}
         </span>
 
@@ -160,10 +160,10 @@ function EditableField({
           {justSaved && (
             <motion.span
               key="saved"
-              initial={{ opacity: 0, x: 6 }}
+              initial={{ opacity: 0, x: 0 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
-              className="text-xs font-medium text-[#228B57]"
+              className="text-xs font-medium text-(--color-primary)"
             >
               Saved
             </motion.span>
@@ -188,12 +188,12 @@ function EditableField({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
               placeholder={placeholder}
-              className="flex-1 rounded-lg border border-[#D8D2C2] bg-white px-3 py-2 text-sm text-[#2B2B24] outline-none focus:border-[#228B57] focus:ring-2 focus:ring-[#228B57]/20"
+              className="flex-1 rounded-lg border border-(--color-line) bg-(--color-bg-card) px-3 py-2 text-sm text-(--color-ink) outline-none focus:border-(--color-accent) focus:ring-2 focus:ring-(--color-accent)/20"
             />
             <button
               onClick={handleSave}
               disabled={saving}
-              className="rounded-lg bg-[#228B57] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1c6f47] disabled:opacity-60"
+              className="rounded-lg bg-(--color-accent) px-3 py-2 text-sm font-medium text-(--color-ink) transition hover:brightness-90 disabled:opacity-60"
             >
               {saving ? "..." : "Save"}
             </button>
@@ -203,7 +203,7 @@ function EditableField({
                 setDraft(value || "");
                 setError("");
               }}
-              className="rounded-lg px-3 py-2 text-sm text-[#8A8375] hover:text-[#2B2B24]"
+              className="rounded-lg px-3 py-2 text-sm text-(--color-ink-soft) hover:text-(--color-accent)"
             >
               Cancel
             </button>
@@ -221,8 +221,8 @@ function EditableField({
             <span
               className={
                 value
-                  ? "text-[15px] text-[#2B2B24]"
-                  : "text-[15px] italic text-[#B5AE9D]"
+                  ? "text-[15px] text-(--color-ink)"
+                  : "text-[15px] italic text-(--color-ink-soft)"
               }
             >
               {value || placeholder}
@@ -269,16 +269,16 @@ function ToggleField({
   };
 
   return (
-    <div className="flex items-center justify-between border-b border-[#EBE6DA] py-4 last:border-none">
+    <div className="flex items-center justify-between border-b border-(--color-line) py-4 last:border-none">
       <div className="pr-4">
-        <span className="block text-sm text-[#2B2B24]">{label}</span>
-        <span className="mt-0.5 block text-xs text-[#8A8375]">{description}</span>
+        <span className="block text-sm text-(--color-ink)">{label}</span>
+        <span className="mt-0.5 block text-xs text-(--color-ink-soft)">{description}</span>
       </div>
       <button
         onClick={handleToggle}
         disabled={saving}
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-          checked ? "bg-[#228B57]" : "bg-[#D8D2C2]"
+          checked ? "bg-(--color-accent)" : "bg-(--color-line)"
         } disabled:opacity-60`}
       >
         <motion.span
@@ -294,12 +294,12 @@ function ToggleField({
 /* ---------- Read-only row ---------- */
 function StaticField({ label, value, badge }: { label: string; value: string; badge?: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between border-b border-[#EBE6DA] py-4 last:border-none">
+    <div className="flex items-center justify-between border-b border-(--color-line) py-4 last:border-none">
       <div>
-        <span className="block text-xs font-medium uppercase tracking-wide text-[#8A8375]">
+        <span className="block text-xs font-medium uppercase tracking-wide text-(--color-ink-soft)">
           {label}
         </span>
-        <span className="mt-1 block text-[15px] text-[#2B2B24]">{value}</span>
+        <span className="mt-1 block text-[15px] text-(--color-ink)">{value}</span>
       </div>
       {badge}
     </div>
@@ -326,21 +326,21 @@ function AddressCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, height: 0, marginBottom: 0 }}
       transition={{ duration: 0.2 }}
-      className="rounded-xl border border-[#EBE6DA] bg-white p-4"
+      className="rounded-xl border border-(--color-line) bg-(--color-bg-card) p-4"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium capitalize text-[#2B2B24]">
+            <span className="text-sm font-medium capitalize text-(--color-ink)">
               {address.label}
             </span>
             {address.is_default && (
-              <span className="rounded-full bg-[#228B57]/10 px-2 py-0.5 text-[11px] font-medium text-[#228B57]">
+              <span className="rounded-full bg-(--color-primary)/10 px-2 py-0.5 text-[11px] font-medium text-(--color-primary)">
                 Default
               </span>
             )}
           </div>
-          <p className="mt-1 truncate text-sm text-[#8A8375]">
+          <p className="mt-1 truncate text-sm text-(--color-ink-soft)">
             {address.full_address}, {address.city} - {address.pincode}
           </p>
         </div>
@@ -349,7 +349,7 @@ function AddressCard({
           {!address.is_default && (
             <button
               onClick={onSetDefault}
-              className="text-xs font-medium text-[#228B57] hover:underline"
+              className="text-xs font-medium text-(--color-accent) hover:underline"
             >
               Set default
             </button>
@@ -440,7 +440,7 @@ function AddAddressForm({ onAdd, onCancel }: { onAdd: (data: any) => Promise<voi
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
       onSubmit={handleSubmit}
-      className="overflow-hidden rounded-xl border border-[#EBE6DA] bg-white p-4"
+      className="overflow-hidden rounded-xl border border-(--color-line) bg-(--color-bg-card) p-4"
     >
       <div className="flex gap-2">
         {["home", "office", "other"].map((l) => (
@@ -450,8 +450,8 @@ function AddAddressForm({ onAdd, onCancel }: { onAdd: (data: any) => Promise<voi
             onClick={() => setForm({ ...form, label: l })}
             className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
               form.label === l
-                ? "bg-[#228B57] text-white"
-                : "bg-[#F4F1EA] text-[#8A8375]"
+                ? "bg-(--color-accent) text-(--color-ink)"
+                : "bg-(--color-bg-deep) text-(--color-ink-soft)"
             }`}
           >
             {l}
@@ -463,20 +463,20 @@ function AddAddressForm({ onAdd, onCancel }: { onAdd: (data: any) => Promise<voi
         value={form.full_address}
         onChange={(e) => setForm({ ...form, full_address: e.target.value })}
         placeholder="House no., street, landmark"
-        className="mt-3 w-full rounded-lg border border-[#D8D2C2] px-3 py-2 text-sm outline-none focus:border-[#228B57] focus:ring-2 focus:ring-[#228B57]/20"
+        className="mt-3 w-full rounded-lg border border-(--color-line) px-3 py-2 text-sm outline-none focus:border-(--color-accent) focus:ring-2 focus:ring-(--color-accent)/20"
       />
       <div className="mt-2 flex gap-2">
         <input
           value={form.city}
           onChange={(e) => setForm({ ...form, city: e.target.value })}
           placeholder="City"
-          className="flex-1 rounded-lg border border-[#D8D2C2] px-3 py-2 text-sm outline-none focus:border-[#228B57] focus:ring-2 focus:ring-[#228B57]/20"
+          className="flex-1 rounded-lg border border-(--color-line) px-3 py-2 text-sm outline-none focus:border-(--color-accent) focus:ring-2 focus:ring-(--color-accent)/20"
         />
         <input
           value={form.pincode}
           onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "").slice(0, 6) })}
           placeholder="Pincode"
-          className="w-28 rounded-lg border border-[#D8D2C2] px-3 py-2 text-sm outline-none focus:border-[#228B57] focus:ring-2 focus:ring-[#228B57]/20"
+          className="w-28 rounded-lg border border-(--color-line) px-3 py-2 text-sm outline-none focus:border-(--color-accent) focus:ring-2 focus:ring-(--color-accent)/20"
         />
       </div>
 
@@ -484,7 +484,7 @@ function AddAddressForm({ onAdd, onCancel }: { onAdd: (data: any) => Promise<voi
         type="button"
         onClick={captureLocation}
         disabled={locating}
-        className="mt-3 flex items-center gap-1.5 text-xs font-medium text-[#228B57] disabled:opacity-60"
+        className="mt-3 flex items-center gap-1.5 text-xs font-medium text-(--color-accent) disabled:opacity-60"
       >
         {locating ? "Getting location..." : coords ? "Location captured ✓" : "Share current location"}
       </button>
@@ -495,14 +495,14 @@ function AddAddressForm({ onAdd, onCancel }: { onAdd: (data: any) => Promise<voi
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-[#228B57] px-4 py-2 text-sm font-medium text-white hover:bg-[#1c6f47] disabled:opacity-60"
+          className="rounded-lg bg-(--color-accent) px-4 py-2 text-sm font-medium text-(--color-ink) hover:brightness-90 disabled:opacity-60"
         >
           {saving ? "Saving..." : "Save address"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg px-4 py-2 text-sm text-[#8A8375] hover:text-[#2B2B24]"
+          className="rounded-lg px-4 py-2 text-sm text-(--color-ink-soft) hover:text-(--color-accent)"
         >
           Cancel
         </button>
@@ -615,26 +615,43 @@ const handleLogout = () => {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#FAF8F3]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          className="h-8 w-8 rounded-full border-2 border-[#228B57] border-t-transparent"
-        />
-      </main>
+      <main className="flex min-h-screen items-center justify-center bg-(--color-bg)">
+  <div
+    className="h-8 w-8 animate-spin rounded-full border-2 border-(--color-accent) border-t-transparent"
+  />
+</main>
     );
   }
 
   if (loadError || !profile) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#FAF8F3] px-4">
-        <p className="text-sm text-[#8A8375]">{loadError}</p>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-[#FAF8F3] px-4 py-10 sm:py-16">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-(--color-bg) px-4 text-center">
+      <div>
+        <h1 className="font-serif text-xl text-(--color-ink)">Something went wrong</h1>
+        <p className="mt-2 max-w-xs text-sm text-(--color-ink-soft)">
+          Sorry about that — {loadError ? loadError.charAt(0).toLowerCase() + loadError.slice(1) : "we couldn't load your profile."}
+        </p>
+      </div>
+
+      <div className="flex gap-3">
+        <Link
+          href="/contact-us"
+          className="rounded-xl bg-(--color-accent) px-5 py-2.5 text-sm font-medium text-(--color-ink) hover:brightness-90"
+        >
+          Contact support
+        </Link>
+        <Link
+          href="/"
+          className="rounded-xl border border-(--color-line) px-5 py-2.5 text-sm font-medium text-(--color-ink-soft) hover:text-(--color-accent)"
+        >
+          Go to home page
+        </Link>
+      </div>
+    </main>
+  );
+}
+  return (
+    <main className="min-h-screen bg-(--color-bg) px-4 py-10 sm:py-16">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -642,54 +659,46 @@ const handleLogout = () => {
         className="mx-auto max-w-xl"
       >
         {/* Header */}
-        {/* Header */}
-<div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-  {/* Left Section */}
-  <div className="flex items-center gap-5">
-    <TrustRing profile={profile} />
+        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-5">
+            <TrustRing profile={profile} />
 
-    <div>
-      <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">
-        {profile.username || "Your profile"}
-      </h1>
+            <div>
+              <h1 className="font-serif text-[26px] leading-tight text-(--color-ink)">
+                {profile.username || "Your profile"}
+              </h1>
 
-      <p className="mt-1 text-sm text-[#8A8375]">
-        Member since {formatMemberSince(profile.created_at)}
-      </p>
+              <p className="mt-1 text-sm text-(--color-ink-soft)">
+                Member since {formatMemberSince(profile.created_at)}
+              </p>
 
-      <span className="mt-2 inline-flex items-center rounded-full bg-[#228B57]/10 px-2.5 py-1 text-xs font-medium text-[#228B57]">
-        {entityLabel}
-      </span>
-    </div>
-  </div>
+              <span className="mt-2 inline-flex items-center rounded-full bg-(--color-primary)/10 px-2.5 py-1 text-xs font-medium text-(--color-primary)">
+                {entityLabel}
+              </span>
+            </div>
+          </div>
 
-  {/* Wallet Balance */}
-  <div className="w-full sm:w-auto">
-    <div className="rounded-2xl border border-[#E8E2D6] bg-gradient-to-br from-[#FFFDF8] to-[#F8F5EE] px-5 py-4 shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex items-center justify-between gap-6 sm:flex-col sm:items-end sm:gap-1">
-        <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#8A8375]">
-          Wallet Balance
-        </span>
+          <div className="w-full sm:w-auto">
+            <div className="rounded-2xl border border-(--color-line) bg-(--color-bg-deep) px-5 py-4 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center justify-between gap-6 sm:flex-col sm:items-end sm:gap-1">
+                <span className="text-xs font-medium uppercase tracking-[0.18em] text-(--color-ink-soft)">
+                  Wallet Balance
+                </span>
 
-        <div className="flex items-baseline gap-1">
-          <span className="text-lg font-semibold text-[#228B57]">₹</span>
-          <span className="font-serif text-3xl font-bold leading-none text-[#2B2B24]">
-            {balance}
-          </span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-lg font-semibold text-(--color-primary)">₹</span>
+                  <span className="font-serif text-3xl font-bold leading-none text-(--color-ink)">
+                    {balance}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
 
         {/* Identity card */}
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.35 }}
-          className="rounded-2xl border border-[#EBE6DA] bg-white px-5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-        >
-          <h2 className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-wide text-[#228B57]">
+        <section className="rounded-2xl border border-(--color-line) bg-(--color-bg-card) px-5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+          <h2 className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-wide text-(--color-primary)">
             Identity
           </h2>
           <StaticField
@@ -697,11 +706,11 @@ const handleLogout = () => {
             value={`+91 ${profile.phone_number}`}
             badge={
               profile.phone_verified ? (
-                <span className="rounded-full bg-[#228B57]/10 px-2.5 py-1 text-xs font-medium text-[#228B57]">
+                <span className="rounded-full bg-(--color-primary)/10 px-2.5 py-1 text-xs font-medium text-(--color-primary)">
                   Verified
                 </span>
               ) : (
-                <span className="rounded-full bg-[#E8A33D]/15 px-2.5 py-1 text-xs font-medium text-[#B87A1A]">
+                <span className="rounded-full bg-(--color-accent-soft) px-2.5 py-1 text-xs font-medium text-(--color-ink)">
                   Unverified
                 </span>
               )
@@ -732,17 +741,12 @@ const handleLogout = () => {
             value={profile.is_goverment_entity}
             onSave={(val) => updateField("is_goverment_entity", val)}
           />
-        </motion.section>
+        </section>
 
         {/* Business details — only shown for business/govt accounts */}
         {(profile.is_business || profile.is_goverment_entity) && (
-          <motion.section
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.35 }}
-            className="mt-5 rounded-2xl border border-[#EBE6DA] bg-white px-5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-          >
-            <h2 className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-wide text-[#228B57]">
+          <section className="mt-5 rounded-2xl border border-(--color-line) bg-(--color-bg-card) px-5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <h2 className="pt-3 pb-1 text-[13px] font-semibold uppercase tracking-wide text-(--color-primary)">
               Business details
             </h2>
             <EditableField
@@ -757,23 +761,18 @@ const handleLogout = () => {
               placeholder="Add your GST number"
               onSave={(val) => updateField("gst_number", val)}
             />
-          </motion.section>
+          </section>
         )}
 
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.35 }}
-          className="mt-5"
-        >
+        <section className="mt-5">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#228B57]">
+            <h2 className="text-[13px] font-semibold uppercase tracking-wide text-(--color-primary)">
               Addresses
             </h2>
             {!addingAddress && (
               <button
                 onClick={() => setAddingAddress(true)}
-                className="text-xs font-medium text-[#228B57] hover:underline"
+                className="text-xs font-medium text-(--color-accent) hover:underline"
               >
                 + Add address
               </button>
@@ -797,42 +796,36 @@ const handleLogout = () => {
                 />
               ))}
               {addresses.length === 0 && !addingAddress && (
-                <p className="rounded-xl border border-dashed border-[#D8D2C2] px-4 py-6 text-center text-sm text-[#8A8375]">
+                <p className="rounded-xl border border-dashed border-(--color-line) px-4 py-6 text-center text-sm text-(--color-ink-soft)">
                   No addresses yet — add one so pickups know where to go.
                 </p>
               )}
             </AnimatePresence>
           </div>
-        </motion.section>
+        </section>
 
+        <div className="mt-10 rounded-2xl border border-(--color-line) bg-(--color-bg-deep) p-5 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="font-serif text-lg text-(--color-ink)">
+                Account
+              </h3>
+              <p className="mt-1 text-sm text-(--color-ink-soft)">
+                Sign out of your account on this device.
+              </p>
+            </div>
 
-        <motion.div
-  initial={{ opacity: 0, y: 12 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.35, ease: "easeOut" }}
-  className="mt-10 rounded-2xl border border-[#E8E2D6] bg-[#FFFDF8] p-5 shadow-sm"
->
-  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <h3 className="font-serif text-lg text-[#2B2B24]">
-        Account
-      </h3>
-      <p className="mt-1 text-sm text-[#8A8375]">
-        Sign out of your account on this device.
-      </p>
-    </div>
-
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
-      onClick={()=>handleLogout()}
-      className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200"
-    >
-      <LogOut className="mr-2 h-4 w-4" />
-      Logout
-    </motion.button>
-  </div>
-</motion.div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={()=>handleLogout()}
+              className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </motion.button>
+          </div>
+        </div>
       </motion.div>
 
 

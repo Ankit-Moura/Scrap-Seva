@@ -1,28 +1,64 @@
-
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
+
+import Footer from "@/components/Footer";
+
+import { AuthHydrator } from "./providers";
 import Navbar from "@/components/NavBar";
 import { AnimatePresence } from "motion/react";
 
-import { AuthHydrator } from "./providers";
 
-
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
-  title: "Scap Seva",
-  description: "Cleaning India one step at a time",
+  title: {
+    default: "RecyclerClub Dehradun — Scrap Pickup at Your Doorstep, Fair Prices",
+    template: "%s | RecyclerClub Dehradun",
+  },
+  description:
+    "Doorstep scrap pickup in Dehradun with instant AI-based price estimates. A verified local kabadiwala partner weighs your paper, plastic, metal, e-waste, and old appliances, and pays you on the spot.",
+  keywords: [
+    "scrap pickup Dehradun",
+    "kabadiwala Dehradun",
+    "sell scrap online Dehradun",
+    "e-waste pickup Dehradun",
+    "old newspaper price Dehradun",
+    "scrap dealer near me Dehradun",
+    "raddi wala Dehradun",
+    "old furniture pickup Dehradun",
+  ],
+  metadataBase: new URL("https://recyclerclub.com"),
+  alternates: {
+    canonical: "https://recyclerclub.com/dehradun",
+  },
+  openGraph: {
+    title: "RecyclerClub Dehradun — Scrap Pickup at Your Doorstep, Fair Prices",
+    description:
+      "Book a doorstep pickup in Dehradun, get a fair AI-estimated price, and get paid on the spot by a verified local partner.",
+    url: "https://recyclerclub.com/dehradun",
+    siteName: "RecyclerClub",
+    locale: "en_IN",
+    type: "website",
+    images: [
+      {
+        url: "/og-image-dehradun.jpg",
+        width: 1200,
+        height: 630,
+        alt: "RecyclerClub Dehradun — doorstep scrap pickup",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RecyclerClub Dehradun — Scrap Pickup at Your Doorstep",
+    description:
+      "Doorstep scrap pickup in Dehradun with instant AI pricing and verified local partners.",
+    images: ["/og-image-dehradun.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -34,7 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+     
     >
       <body className="min-h-full flex flex-col">
         <AuthHydrator>
@@ -46,6 +82,7 @@ export default function RootLayout({
         
         </AnimatePresence>
         </AuthHydrator>
+        <Footer/>
 
         </body>
     </html>

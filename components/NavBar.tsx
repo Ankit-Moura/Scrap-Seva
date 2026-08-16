@@ -7,117 +7,164 @@ import Link from "next/link";
 
 import { useAuthStore } from "@/store/authStore";
 
+import { label } from "framer-motion/client"
+import { Recycle, UserCircle2, Menu, X } from "lucide-react"
+
+
+const navLinks = [{label: "How it works", href: "/how-it-works"}, {label: "Today's rates", href: "/market-rates"}, {label: "Contact Us", href: "/contact-us"}]
+
+
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false)
   const { logout, user } = useAuthStore();
   const [open, setOpen] = useState(false);
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <Link className="flex items-center gap-2.5 cursor-pointer" href="/#">
-          <div className="w-9 h-9 bg-green-500 rounded-xl flex items-center justify-center text-white">
-            <IconRecycle />
-          </div>
-          <span className="text-lg font-extrabold tracking-tight text-gray-900">
-            Scrap<span className="text-green-500">Seva</span>
-          </span>
-        </Link>
-        <ul className="hidden md:flex items-center gap-8">
-          {user && <Link href="/pickups" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">My Pickups</Link>}
-          <li><Link href="/how-it-works" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">How it works</Link></li>
-          <Link href="/market-rates" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Rates & Categories</Link>
-          <li><Link href="/contact-us" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Contact Us</Link></li>
-        </ul>
-        <div className="flex flex-row justify-between align-middle">
-          
-            <Link href={"/book-pickup"} className="hidden md:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors cursor-pointer">
-          Schedule pickup
-        </Link>
-            {user?<Link href={"/profile"} className="hidden md:flex flex-row cursor-pointer ml-4.5">
-                <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
-                <p className=" ml-1 translate-y-1">My Profile</p>
-            </Link>:<Link className="hidden md:flex flex-row cursor-pointer ml-4.5" href={"/auth/register"}>
-                <img className="text-green-400 w-8 h-8" src="/user.svg" alt="user-icon" />
-                <p className=" ml-1 translate-y-1">Sign In</p>
-            </Link>}
-        </div>
-        <button className="md:hidden p-2 rounded-lg hover:bg-gray-100" onClick={() => setOpen(!open)}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
-            {open ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
-          </svg>
-        </button>
-      </div>
-      <AnimatePresence>
-      {open && (
+    <nav className="w-full bg-(--color-bg) border-b border-(--color-line) relative">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 md:px-10 py-3.5 md:py-4">
+
+        {/* Logo */}
+        <Link href={"/"}>
         <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.40, ease: easeInOut }}
-      className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
-      onClick={(p)=>setOpen(!p)}
-    >
-      <div className="px-5 py-4 flex flex-col gap-4 list-none align-middle">
-
-        <motion.li
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            >
-            {user?<Link className="flex flex-row cursor-pointer -translate-x-1" href={"/profile"}>
-            <img className="text-green-400 w-6 h-6" src="/user.svg" alt="user-icon" />
-                <p className=" align-text-bottom">My Profile</p>
-            </Link>
-            :
-            <Link className="flex flex-row cursor-pointer -translate-x-1" href={"auth/register"}>
-                <img className="text-green-400 w-6 h-6" src="/user.svg" alt="user-icon" />
-                <p className=" align-text-bottom">Register</p>
-            </Link>}
-            </motion.li>
-        <motion.li
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            >
-
-        <Link href={"/book-pickup"}  onClick={() => {
-    setOpen(false)
-  }} className="w-full text-green-500 font-semibold text-sm  py-3 rounded-xl">Schedule pickup</Link></motion.li>
-
-   {user && <motion.li
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            >
-                <Link href="/pickups"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">My pickups</Link>
-            </motion.li>}
-        <motion.li
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            >
-                <Link href="/how-it-works"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">How it works</Link>
-            </motion.li>
-        <motion.li
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            >
-                <Link href="/market-rates"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">Rates & Categories</Link>
-            </motion.li>
-        <motion.li
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            >
-                <a href="/contact-us"onClick={() => setOpen(false)} className="text-sm font-medium text-gray-600">Contact Us</a>
-            </motion.li>
-        
-          
-          
-          
-        </div>
+          className="flex items-center gap-2 cursor-pointer"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <div  className="w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center">
+            <img className="w-full h-full object-contain" src="./logo.svg" alt="recycler club logo" />
+          </div>
+          <span className="text-lg md:text-xl font-semibold tracking-tight text-(--color-ink)">
+            RecyclerClub
+          </span>
         </motion.div>
-      )}
+        </Link>
+
+        {/* Middle: nav links */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-(--color-ink-soft)">
+          {navLinks.map((link, index) => (
+            <Link
+              key={index}
+              href={link.href}
+              className="relative group py-1 hover:text-(--color-ink) transition-colors focus-visible:outline-none focus-visible:text-(--color-ink)"
+            >
+              {link.label}
+              <span className="absolute left-0 -bottom-0.5 h-[1.5px] w-full origin-left scale-x-0 bg-(--color-primary) transition-transform duration-300 ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100" />
+            </Link>
+          ))}
+        </div>
+
+        {/* Right: user icon + schedule pickup */}
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+          <Link href={"/profile"}>
+          <motion.button
+            aria-label="Account"
+            className="hidden sm:flex w-9 h-9 rounded-full items-center justify-center text-(--color-ink-soft) hover:text-(--color-ink) hover:bg-(--color-bg-deep) transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary)"
+            whileHover={{ scale: 1.08, rotate: -6 }}
+            whileTap={{ scale: 0.92 }}
+          >
+            <UserCircle2 className="w-6 h-6" strokeWidth={1.8} />
+          </motion.button>
+          </Link>
+          <Link href={"/book-pickup"}>
+          <motion.button
+            className="hidden md:block relative overflow-hidden rounded-full px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium border border-(--color-accent) text-(--color-ink) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 whitespace-nowrap"
+            initial="rest"
+            whileHover="hover"
+            whileTap={{ scale: 0.96 }}
+            animate="rest"
+          >
+            <motion.span
+              className="absolute inset-0 bg-(--color-primary)"
+              variants={{
+                rest: { scaleX: 0 },
+                hover: { scaleX: 1 },
+              }}
+              style={{ originX: 0 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            />
+            <motion.span
+              className="relative z-10"
+              variants={{
+                rest: { color: "var(--color-primary-dark)" },
+                hover: { color: "var(--color-accent)" },
+              }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            >
+              <span className="sm:hidden">Pickup</span>
+              <span className="hidden sm:inline">Schedule pickup</span>
+            </motion.span>
+          </motion.button>
+          </Link>
+
+          {/* Hamburger — mobile only */}
+          <motion.button
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="md:hidden w-9 h-9 rounded-full flex items-center justify-center text-(--color-ink-soft) hover:text-(--color-ink) hover:bg-(--color-bg-deep) transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary)"
+            whileTap={{ scale: 0.92 }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {menuOpen ? (
+                <motion.span
+                  key="close"
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex"
+                >
+                  <X className="w-5 h-5" strokeWidth={1.8} />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="open"
+                  initial={{ opacity: 0, rotate: 90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: -90 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex"
+                >
+                  <Menu className="w-5 h-5" strokeWidth={1.8} />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+
+      </div>
+
+      {/* Mobile dropdown menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden border-t border-(--color-line) bg-(--color-bg)"
+          >
+            <div className="flex flex-col px-4 sm:px-6 py-3 gap-1">
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2.5 text-sm font-medium text-(--color-ink-soft) hover:text-(--color-ink) transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <Link
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="sm:hidden flex items-center gap-2 py-2.5 text-sm font-medium text-(--color-ink-soft) hover:text-(--color-ink) transition-colors"
+              >
+                <UserCircle2 className="w-4 h-4" strokeWidth={1.8} />
+                Account
+              </Link>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </nav>
   );

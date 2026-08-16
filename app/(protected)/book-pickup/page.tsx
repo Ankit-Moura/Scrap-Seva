@@ -64,7 +64,6 @@ function formatMoney(n: number) {
   return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
 }
 
-/* ---------- Quantity stepper ---------- */
 function QuantityStepper({
   value,
   unit,
@@ -79,16 +78,16 @@ function QuantityStepper({
     <div className="flex items-center gap-2">
       <button
         onClick={() => onChange(Math.max(0, +(value - step).toFixed(2)))}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F4F1EA] text-[#2B2B24] hover:bg-[#EBE6DA]"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-accent)/10 text-(--color-accent) hover:bg-(--color-accent)/20"
       >
         <Icons.Minus className="h-3.5 w-3.5" />
       </button>
-      <span className="w-14 text-center text-sm tabular-nums text-[#2B2B24]">
+      <span className="w-14 text-center text-sm tabular-nums text-(--color-ink)">
         {value} {unit}
       </span>
       <button
         onClick={() => onChange(+(value + step).toFixed(2))}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#228B57] text-white hover:bg-[#1c6f47]"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-accent) text-(--color-ink) hover:brightness-90"
       >
         <Icons.Plus className="h-3.5 w-3.5" />
       </button>
@@ -121,10 +120,10 @@ function ItemPickerStep({
 
   return (
     <div>
-      <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">
+      <h1 className="font-serif text-[26px] leading-tight text-(--color-ink)">
         What are you giving away today?
       </h1>
-      <p className="mt-1.5 text-sm text-[#8A8375]">
+      <p className="mt-1.5 text-sm text-(--color-ink-soft)">
         Pick what you have — we'll show you what it's worth as you go.
       </p>
 
@@ -137,25 +136,25 @@ function ItemPickerStep({
           return (
             <div
               key={cat.id}
-              className="overflow-hidden rounded-2xl border border-[#EBE6DA] bg-white"
+              className="overflow-hidden rounded-2xl border border-(--color-line) bg-(--color-bg-card)"
             >
               <button
                 onClick={() => setOpenCategory(isOpen ? null : cat.id)}
                 className="flex w-full items-center justify-between px-4 py-3.5"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#228B57]/10">
-                    <CategoryIcon name={cat.icon} className="h-4.5 w-4.5 text-[#228B57]" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--color-primary)/10">
+                    <CategoryIcon name={cat.icon} className="h-4.5 w-4.5 text-(--color-primary)" />
                   </div>
-                  <span className="text-[15px] font-medium text-[#2B2B24]">{cat.name}</span>
+                  <span className="text-[15px] font-medium text-(--color-ink)">{cat.name}</span>
                   {selectedInCat > 0 && (
-                    <span className="rounded-full bg-[#228B57] px-2 py-0.5 text-[11px] font-medium text-white">
+                    <span className="rounded-full bg-(--color-primary) px-2 py-0.5 text-[11px] font-medium text-white">
                       {selectedInCat}
                     </span>
                   )}
                 </div>
                 <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <Icons.ChevronDown className="h-4 w-4 text-[#8A8375]" />
+                  <Icons.ChevronDown className="h-4 w-4 text-(--color-accent)" />
                 </motion.div>
               </button>
 
@@ -168,17 +167,17 @@ function ItemPickerStep({
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="border-t border-[#EBE6DA] px-4">
+                    <div className="border-t border-(--color-line) px-4">
                       {catItems.map((item) => {
                         const qty = selected[item.id] || 0;
                         return (
                           <div
                             key={item.id}
-                            className="flex items-center justify-between gap-3 border-b border-[#F4F1EA] py-3 last:border-none"
+                            className="flex items-center justify-between gap-3 border-b border-(--color-bg-deep) py-3 last:border-none"
                           >
                             <div className="min-w-0">
-                              <p className="truncate text-sm text-[#2B2B24]">{item.name}</p>
-                              <p className="text-xs text-[#8A8375]">
+                              <p className="truncate text-sm text-(--color-ink)">{item.name}</p>
+                              <p className="text-xs text-(--color-ink-soft)">
                                 ₹{item.base_rate}/{item.unit}
                               </p>
                             </div>
@@ -204,7 +203,7 @@ function ItemPickerStep({
                                     [item.id]: item.unit === "kg" ? 1 : 1,
                                   }))
                                 }
-                                className="rounded-full border border-[#228B57] px-3 py-1.5 text-xs font-medium text-[#228B57] hover:bg-[#228B57]/5"
+                                className="rounded-full border border-(--color-accent) px-3 py-1.5 text-xs font-medium text-(--color-accent) hover:bg-(--color-accent)/10"
                               >
                                 Add
                               </button>
@@ -234,30 +233,30 @@ function ReviewStep({
 }) {
   return (
     <div>
-      <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">
+      <h1 className="font-serif text-[26px] leading-tight text-(--color-ink)">
         Here's what you'll get
       </h1>
-      <p className="mt-1.5 text-sm text-[#8A8375]">
+      <p className="mt-1.5 text-sm text-(--color-ink-soft)">
         A rough estimate — final weight is confirmed at pickup.
       </p>
 
-      <div className="mt-6 rounded-2xl border border-[#EBE6DA] bg-white px-4">
+      <div className="mt-6 rounded-2xl border border-(--color-line) bg-(--color-bg-card) px-4">
         {selectedItems.map(({ item, quantity }) => (
           <div
             key={item.id}
-            className="flex items-center justify-between border-b border-[#F4F1EA] py-3.5 last:border-none"
+            className="flex items-center justify-between border-b border-(--color-bg-deep) py-3.5 last:border-none"
           >
             <div>
-              <p className="text-sm text-[#2B2B24]">{item.name}</p>
-              <p className="text-xs text-[#8A8375]">
+              <p className="text-sm text-(--color-ink)">{item.name}</p>
+              <p className="text-xs text-(--color-ink-soft)">
                 {quantity} {item.unit} × ₹{item.base_rate}
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="font-serif text-[15px] text-[#2B2B24]">
+              <span className="font-serif text-[15px] text-(--color-ink)">
                 ₹{formatMoney(quantity * parseFloat(item.base_rate))}
               </span>
-              <button onClick={() => onRemove(item.id)} className="text-[#B5AE9D] hover:text-red-500">
+              <button onClick={() => onRemove(item.id)} className="text-(--color-accent) hover:text-red-500">
                 <Icons.X className="h-4 w-4" />
               </button>
             </div>
@@ -290,18 +289,18 @@ function LogisticsStep({
 
   return (
     <div>
-      <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">Where & when?</h1>
-      <p className="mt-1.5 text-sm text-[#8A8375]">
+      <h1 className="font-serif text-[26px] leading-tight text-(--color-ink)">Where & when?</h1>
+      <p className="mt-1.5 text-sm text-(--color-ink-soft)">
         A kabadiwala will arrive during your chosen window.
       </p>
 
-      <h2 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#8A8375]">
+      <h2 className="mt-6 text-xs font-semibold uppercase tracking-wide text-(--color-ink-soft)">
         Pickup address
       </h2>
       {addresses.length === 0 ? (
         <Link
           href="/profile"
-          className="mt-2 block rounded-xl border border-dashed border-[#D8D2C2] px-4 py-5 text-center text-sm text-[#228B57]"
+          className="mt-2 block rounded-xl border border-dashed border-(--color-accent)/40 px-4 py-5 text-center text-sm text-(--color-accent)"
         >
           Add an address in your profile to continue →
         </Link>
@@ -313,19 +312,19 @@ function LogisticsStep({
               onClick={() => setSelectedAddress(addr.id)}
               className={`w-full rounded-xl border px-4 py-3 text-left transition ${
                 selectedAddress === addr.id
-                  ? "border-[#228B57] bg-[#228B57]/5"
-                  : "border-[#EBE6DA] bg-white"
+                  ? "border-(--color-accent) bg-(--color-accent)/10"
+                  : "border-(--color-line) bg-(--color-bg-card)"
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium capitalize text-[#2B2B24]">{addr.label}</span>
+                <span className="text-sm font-medium capitalize text-(--color-ink)">{addr.label}</span>
                 {addr.is_default && (
-                  <span className="rounded-full bg-[#228B57]/10 px-2 py-0.5 text-[10px] font-medium text-[#228B57]">
+                  <span className="rounded-full bg-(--color-primary)/10 px-2 py-0.5 text-[10px] font-medium text-(--color-primary)">
                     Default
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 truncate text-xs text-[#8A8375]">
+              <p className="mt-0.5 truncate text-xs text-(--color-ink-soft)">
                 {addr.full_address}, {addr.city}
               </p>
             </button>
@@ -333,25 +332,25 @@ function LogisticsStep({
         </div>
       )}
 
-      <h2 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#8A8375]">Day</h2>
+      <h2 className="mt-6 text-xs font-semibold uppercase tracking-wide text-(--color-ink-soft)">Day</h2>
       <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
         {days.map((d, i) => (
           <button
             key={i}
             onClick={() => setSelectedDay(i)}
             className={`flex shrink-0 flex-col items-center rounded-xl border px-3.5 py-2.5 ${
-              selectedDay === i ? "border-[#228B57] bg-[#228B57]/5" : "border-[#EBE6DA] bg-white"
+              selectedDay === i ? "border-(--color-accent) bg-(--color-accent)/10" : "border-(--color-line) bg-(--color-bg-card)"
             }`}
           >
-            <span className="text-[11px] text-[#8A8375]">
+            <span className="text-[11px] text-(--color-ink-soft)">
               {d.toLocaleDateString("en-IN", { weekday: "short" })}
             </span>
-            <span className="text-sm font-medium text-[#2B2B24]">{d.getDate()}</span>
+            <span className="text-sm font-medium text-(--color-ink)">{d.getDate()}</span>
           </button>
         ))}
       </div>
 
-      <h2 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#8A8375]">
+      <h2 className="mt-6 text-xs font-semibold uppercase tracking-wide text-(--color-ink-soft)">
         Time window
       </h2>
       <div className="mt-2 grid grid-cols-3 gap-2">
@@ -360,11 +359,11 @@ function LogisticsStep({
             key={slot.key}
             onClick={() => setSelectedSlot(slot.key)}
             className={`rounded-xl border px-3 py-3 text-center ${
-              selectedSlot === slot.key ? "border-[#228B57] bg-[#228B57]/5" : "border-[#EBE6DA] bg-white"
+              selectedSlot === slot.key ? "border-(--color-accent) bg-(--color-accent)/10" : "border-(--color-line) bg-(--color-bg-card)"
             }`}
           >
-            <span className="block text-sm font-medium text-[#2B2B24]">{slot.label}</span>
-            <span className="block text-[11px] text-[#8A8375]">{slot.time}</span>
+            <span className="block text-sm font-medium text-(--color-ink)">{slot.label}</span>
+            <span className="block text-[11px] text-(--color-ink-soft)">{slot.time}</span>
           </button>
         ))}
       </div>
@@ -388,29 +387,29 @@ function ConfirmStep({
 }) {
   return (
     <div>
-      <h1 className="font-serif text-[26px] leading-tight text-[#2B2B24]">Confirm your pickup</h1>
-      <p className="mt-1.5 text-sm text-[#8A8375]">Review before you send the request.</p>
+      <h1 className="font-serif text-[26px] leading-tight text-(--color-ink)">Confirm your pickup</h1>
+      <p className="mt-1.5 text-sm text-(--color-ink-soft)">Review before you send the request.</p>
 
-      <div className="mt-6 rounded-2xl border border-[#EBE6DA] bg-white p-5">
+      <div className="mt-6 rounded-2xl border border-(--color-line) bg-(--color-bg-card) p-5">
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-[#8A8375]">Estimated payout</span>
-          <span className="font-serif text-2xl text-[#228B57]">₹{formatMoney(total)}</span>
+          <span className="text-sm text-(--color-ink-soft)">Estimated payout</span>
+          <span className="font-serif text-2xl text-(--color-primary)">₹{formatMoney(total)}</span>
         </div>
-        <p className="mt-1 text-xs text-[#B5AE9D]">
+        <p className="mt-1 text-xs text-(--color-ink-soft)">
           {selectedItems.length} item{selectedItems.length !== 1 ? "s" : ""} · confirmed on pickup
         </p>
 
-        <div className="mt-4 border-t border-[#EBE6DA] pt-4">
+        <div className="mt-4 border-t border-(--color-line) pt-4">
           <div className="flex items-start gap-2.5">
-            <Icons.MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#8A8375]" />
+            <Icons.MapPin className="mt-0.5 h-4 w-4 shrink-0 text-(--color-ink-soft)" />
             <div>
-              <p className="text-sm text-[#2B2B24]">{address.full_address}</p>
-              <p className="text-xs text-[#8A8375]">{address.city} - {address.pincode}</p>
+              <p className="text-sm text-(--color-ink)">{address.full_address}</p>
+              <p className="text-xs text-(--color-ink-soft)">{address.city} - {address.pincode}</p>
             </div>
           </div>
           <div className="mt-3 flex items-center gap-2.5">
-            <Icons.Clock className="h-4 w-4 shrink-0 text-[#8A8375]" />
-            <p className="text-sm text-[#2B2B24]">
+            <Icons.Clock className="h-4 w-4 shrink-0 text-(--color-ink-soft)" />
+            <p className="text-sm text-(--color-ink)">
               {day.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}, {slot.label} ({slot.time})
             </p>
           </div>
@@ -429,24 +428,24 @@ function SuccessStep({ total, onBookAnother }: { total: number; onBookAnother: (
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 18 }}
-        className="flex h-16 w-16 items-center justify-center rounded-full bg-[#228B57]"
+        className="flex h-16 w-16 items-center justify-center rounded-full bg-(--color-primary)"
       >
         <Icons.Check className="h-8 w-8 text-white" />
       </motion.div>
-      <h1 className="mt-5 font-serif text-2xl text-[#2B2B24]">Pickup requested</h1>
-      <p className="mt-1.5 max-w-xs text-sm text-[#8A8375]">
+      <h1 className="mt-5 font-serif text-2xl text-(--color-ink)">Pickup requested</h1>
+      <p className="mt-1.5 max-w-xs text-sm text-(--color-ink-soft)">
         We'll notify you once a kabadiwala accepts. Estimated payout: ₹{formatMoney(total)}.
       </p>
       <div className="mt-6 flex gap-3">
         <button
           onClick={() => router.push("/pickups")}
-          className="rounded-xl bg-[#228B57] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#1c6f47]"
+          className="rounded-xl bg-(--color-accent) px-5 py-2.5 text-sm font-medium text-(--color-ink) hover:brightness-90"
         >
           View my pickups
         </button>
         <button
           onClick={onBookAnother}
-          className="rounded-xl px-5 py-2.5 text-sm font-medium text-[#8A8375] hover:text-[#2B2B24]"
+          className="rounded-xl px-5 py-2.5 text-sm font-medium text-(--color-ink-soft) hover:text-(--color-accent)"
         >
           Book another
         </button>
@@ -566,29 +565,28 @@ export default function BookPickupPage() {
     }
   };
 
-  if (loading) {
+if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#FAF8F3]">
+      <main className="flex min-h-screen items-center justify-center bg-(--color-bg)">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          className="h-8 w-8 rounded-full border-2 border-[#228B57] border-t-transparent"
+          className="h-8 w-8 rounded-full border-2 border-(--color-accent) border-t-transparent"
         />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#FAF8F3] px-4 pb-32 pt-8 sm:pt-14">
+    <main className="min-h-screen bg-(--color-bg) px-4 pb-32 pt-8 sm:pt-14">
       <div className="mx-auto max-w-xl">
-        {/* Progress dots */}
         {step !== "success" && (
           <div className="mb-6 flex gap-1.5">
             {stepOrder.map((s, i) => (
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full transition-colors ${
-                  i <= stepIndex ? "bg-[#228B57]" : "bg-[#EBE6DA]"
+                  i <= stepIndex ? "bg-(--color-primary-light)" : "bg-(--color-line)"
                 }`}
               />
             ))}
@@ -650,7 +648,6 @@ export default function BookPickupPage() {
         {error && <p className="mt-3 text-center text-sm text-red-600">{error}</p>}
       </div>
 
-      {/* Sticky bottom bar */}
       <AnimatePresence>
         {step !== "success" && (selectedItems.length > 0 || step !== "items") && (
           <motion.div
@@ -658,22 +655,22 @@ export default function BookPickupPage() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-x-0 bottom-0 border-t border-[#EBE6DA] bg-white/95 px-4 py-3.5 backdrop-blur"
+            className="fixed inset-x-0 bottom-0 border-t border-(--color-line) bg-(--color-bg-card)/95 px-4 py-3.5 backdrop-blur"
           >
             <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 {step !== "items" && (
                   <button
                     onClick={goBack}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-[#EBE6DA] text-[#8A8375]"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-(--color-line) text-(--color-accent)"
                   >
                     <Icons.ArrowLeft className="h-4 w-4" />
                   </button>
                 )}
                 {selectedItems.length > 0 && step !== "confirm" && (
                   <div>
-                    <p className="text-[11px] text-[#8A8375]">Estimated</p>
-                    <p className="font-serif text-lg leading-none text-[#228B57]">
+                    <p className="text-[11px] text-(--color-ink-soft)">Estimated</p>
+                    <p className="font-serif text-lg leading-none text-(--color-ink)">
                       ₹{formatMoney(total)}
                     </p>
                   </div>
@@ -684,7 +681,7 @@ export default function BookPickupPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="flex-1 rounded-xl bg-[#228B57] py-3 text-sm font-medium text-white hover:bg-[#1c6f47] disabled:opacity-60"
+                  className="flex-1 rounded-xl bg-(--color-accent) py-3 text-sm font-medium text-(--color-ink) hover:brightness-90 disabled:opacity-60"
                 >
                   {submitting ? "Sending request..." : "Confirm pickup"}
                 </button>
@@ -692,7 +689,7 @@ export default function BookPickupPage() {
                 <button
                   onClick={goNext}
                   disabled={!canContinue}
-                  className="rounded-xl bg-[#228B57] px-6 py-3 text-sm font-medium text-white hover:bg-[#1c6f47] disabled:opacity-40"
+                  className="rounded-xl bg-(--color-accent) px-6 py-3 text-sm font-medium text-(--color-ink) hover:brightness-90 disabled:opacity-40"
                 >
                   Continue
                 </button>
