@@ -8,8 +8,7 @@ import * as Icons from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL 
 /* ---------- Types ---------- */
 interface PickupItem {
   id: string;

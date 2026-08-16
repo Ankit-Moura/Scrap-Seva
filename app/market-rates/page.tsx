@@ -7,8 +7,7 @@ import axios from "axios";
 import * as LucideIcons from "lucide-react";
 import { Package, Search as SearchIcon, SlidersHorizontal, X } from "lucide-react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL 
 interface ScrapCategory {
   id: number;
   name: string;

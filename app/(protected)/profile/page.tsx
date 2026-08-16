@@ -8,8 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL 
 interface Profile {
   id: string;
   phone_number: string;

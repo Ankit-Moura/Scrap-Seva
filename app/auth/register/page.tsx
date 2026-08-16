@@ -16,7 +16,7 @@ import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useAuthStore } from '@/store/authStore';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
 const RESEND_SECONDS = 30;
 const OTP_LENGTH = 6;
 

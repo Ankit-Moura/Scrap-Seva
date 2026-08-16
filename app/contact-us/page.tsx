@@ -7,7 +7,7 @@ import axios from "axios";
 import * as Icons from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL 
 
 const CATEGORIES = [
   { value: "general_inquiry", label: "General inquiry", icon: "MessageCircle" },

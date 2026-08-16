@@ -6,7 +6,7 @@ import IconRecycle from "./Icon";
 import Link from "next/link";
 import axios from "axios";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL 
 
 const IMAGES = {
   hero: "./indian-faimly-task-picking.png",

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 export function AuthHydrator({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
