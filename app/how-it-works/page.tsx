@@ -10,7 +10,7 @@ const STEPS = [
   {
     icon: "ListChecks",
     title: "Tell us what you have",
-    body: "Pick your categories — paper, metal, plastic, e-waste and more. See an estimate before you commit to anything.",
+    body: "Pick what you have — a fridge, an AC, a television, a car. See the published rate before you commit to anything.",
   },
   {
     icon: "CalendarClock",
@@ -20,7 +20,7 @@ const STEPS = [
   {
     icon: "Truck",
     title: "A kabadiwala comes to you",
-    body: "They arrive in your window, weigh everything on the spot, and confirm the final amount with you before anything changes hands.",
+    body: "They arrive in your window with the right vehicle, check the condition with you, and confirm the final amount before anything is moved.",
   },
   {
     icon: "Wallet",
@@ -156,7 +156,7 @@ export default function HowItWorksPage() {
               icon="Banknote"
               title="Cash on the spot"
               points={[
-                "Paid the moment your scrap is weighed",
+                "Paid before anything leaves your door",
                 "No app needed to receive it",
               ]}
             />

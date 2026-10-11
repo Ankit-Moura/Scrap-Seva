@@ -12,34 +12,29 @@ import HowItWorks from "@/components/HowItWorks";
 import Link from "next/link";
 import HomePage from "@/components/HomePage";
 
-const BEFORE = "Turn your scrap into cash using ";
+const BEFORE = "Turn it into cash. We collect ";
 
 const ITEMS = [
-  "paper",
-  "plastic",
-  "metal",
-  "e-waste",
-  "cardboard",
-  "newspapers",
-  "old furniture",
-  "refrigerator",
-  "washing machine",
-  "air conditioner",
-  "iron",
-  "steel utensils",
-  "old books",
-  "copper wires",
-  "brass items",
-  "aluminium",
-  "car battery",
-  "inverter battery",
-  "old mattress",
-  "tyres",
-  "glass bottles",
-  "old clothes",
-  "wooden furniture",
-  "computer parts",
-  "mobile phones",
+  "a refrigerator",
+  "a washing machine",
+  "an air conditioner",
+  "a television",
+  "an old car",
+  "a motorcycle",
+  "an inverter battery",
+  "a deep freezer",
+  "a laptop",
+  "a desktop computer",
+  "a microwave",
+  "a geyser",
+  "a water purifier",
+  "a generator",
+  "a solar panel",
+  "a printer",
+  "a treadmill",
+  "a steel almirah",
+  "a scooter",
+  "a car battery",
 ];
 function HeroHeading() {
   const fullHeading = BEFORE + ITEMS[0] ;
@@ -189,9 +184,9 @@ export default function Home() {
         }}
         className="text-sm sm:text-base leading-relaxed text-(--color-ink-soft) md:text-lg"
       >
-        Book a pickup, get instant fair rates, and let a verified kabadiwala
-        handle the rest. Paper, plastic, metal, e-waste — weighed, priced, and
-        paid on the spot.
+        Book a pickup at a published rate and let a verified partner handle
+        the rest. Appliances, electronics, batteries and vehicles — carried
+        out, valued, and paid for on the spot.
       </motion.p>
 
             <motion.div

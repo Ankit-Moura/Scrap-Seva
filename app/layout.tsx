@@ -16,16 +16,16 @@ export const metadata: Metadata = {
     template: "%s | RecyclerClub Dehradun",
   },
   description:
-    "Doorstep scrap pickup in Dehradun with instant AI-based price estimates. A verified local kabadiwala partner weighs your paper, plastic, metal, e-waste, and old appliances, and pays you on the spot.",
+    "Doorstep collection of large scrap in Dehradun - fridges, washing machines, air conditioners, televisions, computers, batteries, generators and end-of-life vehicles. A verified local partner values it in front of you and pays on the spot.",
   keywords: [
-    "scrap pickup Dehradun",
-    "kabadiwala Dehradun",
-    "sell scrap online Dehradun",
+    "old fridge sell Dehradun",
+    "sell old washing machine Dehradun",
+    "old AC sale Dehradun",
+    "scrap car Dehradun",
+    "old TV sell Dehradun",
     "e-waste pickup Dehradun",
-    "old newspaper price Dehradun",
     "scrap dealer near me Dehradun",
-    "raddi wala Dehradun",
-    "old furniture pickup Dehradun",
+    "kabadiwala Dehradun",
   ],
   metadataBase: new URL("https://recyclerclub.com"),
   alternates: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RecyclerClub Dehradun — Scrap Pickup at Your Doorstep, Fair Prices",
     description:
-      "Book a doorstep pickup in Dehradun, get a fair AI-estimated price, and get paid on the spot by a verified local partner.",
+      "Selling an old fridge, AC, TV or car in Dehradun? Book a doorstep pickup at a published rate and get paid on the spot by a verified local partner.",
     url: "https://recyclerclub.com/dehradun",
     siteName: "RecyclerClub",
     locale: "en_IN",
