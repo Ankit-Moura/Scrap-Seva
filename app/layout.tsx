@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 
 import { AuthHydrator } from "./providers";
 import Navbar from "@/components/NavBar";
+import PickupTicker from "@/components/PickupTicker";
 import { AnimatePresence } from "motion/react";
 
 
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthHydrator>
         
+        <PickupTicker/>
         <Navbar/>
         <AnimatePresence mode="wait">
         

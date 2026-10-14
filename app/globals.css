@@ -16,9 +16,9 @@
 
   --color-line: #D8E1DA;
 }
-/* Example pickups strip under the hero */
+/* Pickups strip above the navbar */
 @keyframes ticker {
-  to { transform: translateX(calc(-50% - 0.375rem)); }
+  to { transform: translateX(calc(-50% - 1rem)); }
 }
 .ticker-track { animation: ticker 45s linear infinite; }
 .ticker-mask {

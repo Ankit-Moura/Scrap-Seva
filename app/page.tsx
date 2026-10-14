@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { ArrowRight, Truck } from "lucide-react";
 import Image from "next/image";
 import HowItWorks from "@/components/HowItWorks";
-import PickupTicker from "@/components/PickupTicker";
 import Link from "next/link";
 import HomePage from "@/components/HomePage";
 
@@ -180,7 +179,6 @@ export default function Home() {
 
         </div>
       </section>
-      <PickupTicker/>
       <HowItWorks/>
       <HomePage/>
     </>
