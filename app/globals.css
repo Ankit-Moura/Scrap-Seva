@@ -24,6 +24,8 @@
 .ticker-mask {
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
+/* Windows' "Animation effects: off" reports reduce, and stopping dead read as
+   broken. Slower instead, and hovering still pauses it. */
 @media (prefers-reduced-motion: reduce) {
-  .ticker-track { animation: none; }
+  .ticker-track { animation-duration: 90s; }
 }
