@@ -76,21 +76,21 @@ function RateCard({ item, iconName, index }: { item: ScrapItem; iconName: string
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ delay: Math.min(index, 10) * 0.03, duration: 0.25, ease: "easeOut" }}
-      className="flex items-center justify-between gap-3 rounded-xl border border-[#EBE6DA] bg-white p-3.5 transition-colors hover:border-[#228B57]/40 sm:p-4"
+      className="flex items-start justify-between gap-3 rounded-xl border border-[#EBE6DA] bg-white p-3.5 transition-colors hover:border-[#228B57]/40 sm:p-4"
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#228B57]/10 sm:h-11 sm:w-11">
           <Icon className="h-[18px] w-[18px] text-[#228B57] sm:h-5 sm:w-5" strokeWidth={1.75} />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-[#2B2B24] sm:text-[15px]">{item.name}</p>
-          <p className="truncate text-xs text-[#8A8375]">
+          <p className="break-words text-sm font-medium leading-snug text-[#2B2B24] sm:text-[15px]">{item.name}</p>
+          <p className="mt-0.5 text-xs text-[#8A8375]">
             {item.category_name} · /{item.unit}
           </p>
         </div>
       </div>
 
-      <p className="shrink-0 whitespace-nowrap font-serif text-lg tabular-nums text-[#2B2B24] sm:text-xl">
+      <p className="mt-0.5 shrink-0 whitespace-nowrap font-serif text-lg tabular-nums text-[#2B2B24] sm:text-xl">
         ₹<RateCount value={isNaN(rate) ? 0 : rate} />
       </p>
     </motion.div>
@@ -111,12 +111,12 @@ function CategoryButton({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+      className={`flex w-full items-start gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
         active ? "bg-[#228B57] text-white" : "text-[#4A4638] hover:bg-[#F1EEE4]"
       }`}
     >
-      <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-      <span className="truncate">{category.name}</span>
+      <Icon className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+      <span className="leading-snug">{category.name}</span>
     </button>
   );
 }
@@ -316,7 +316,7 @@ export default function MarketRatesPage() {
             </div>
 
             {loadingItems ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="h-[68px] animate-pulse rounded-xl bg-[#EBE6DA]/60 sm:h-[76px]" />
                 ))}
@@ -330,7 +330,7 @@ export default function MarketRatesPage() {
                 <p className="text-sm text-[#8A8375]">No items match your filters.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <AnimatePresence mode="popLayout">
                   {items.map((item, index) => (
                     <RateCard
