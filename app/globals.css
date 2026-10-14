@@ -16,3 +16,14 @@
 
   --color-line: #D8E1DA;
 }
+/* Example pickups strip under the hero */
+@keyframes ticker {
+  to { transform: translateX(calc(-50% - 0.375rem)); }
+}
+.ticker-track { animation: ticker 45s linear infinite; }
+.ticker-mask {
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
