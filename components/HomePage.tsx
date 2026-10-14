@@ -5,26 +5,14 @@ import { motion, useInView, animate, AnimatePresence } from "motion/react";
 import IconRecycle from "./Icon";
 import Link from "next/link";
 import axios from "axios";
+import { BatteryCharging, Factory, Weight } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL 
 
 const IMAGES = {
-  hero: "./indian-faimly-task-picking.png",
-  bookAppointment: "./bookAppointment.png",
-  recycle: "./recycle.png",
-  paperWaste: "./paperWaste.png",
-  eWaste: "./eWaste.png ",
   cityView: "./cityView.png",
-  plasticWaste: "./plasticWaste.png ",
-  metalWaste: "./metalWaste.png",
-  homePickUp: "./homePickUp.png",
 };
 
-const IconMapPin = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
-  </svg>
-);
 const IconCheck = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
     <path d="M20 6 9 17l-5-5" />
@@ -35,78 +23,56 @@ const IconPhone = () => (
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.36 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.11 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.09a16 16 0 0 0 6 6l.46-.46a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z" />
   </svg>
 );
-const IconScale = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-    <path d="M12 3v18" /><path d="M5 8h14" /><path d="M5 8 2.5 14a2.5 2.5 0 0 0 5 0Z" /><path d="M19 8l-2.5 6a2.5 2.5 0 0 0 5 0Z" /><path d="M8 21h8" />
-  </svg>
-);
 const IconArrowRight = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
     <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
   </svg>
 );
 
-const STEPS = [
-  {
-    num: "1",
-    img: IMAGES.bookAppointment,
-    imgAlt: "Booking a Recycler Club pickup slot on a phone",
-    title: "Book your slot",
-    desc: "Enter your Dehradun pincode and pick a time. Morning and evening slots, all week.",
-  },
-  {
-    num: "2",
-    img: IMAGES.homePickUp,
-    imgAlt: "Recycler Club agent arriving at a home with a certified scale",
-    title: "We weigh it, fair and square",
-    desc: "Our agent brings a certified scale to your door. You watch the reading — no eyeballing, no lowballing.",
-  },
-  {
-    num: "3",
-    img: IMAGES.recycle,
-    imgAlt: "Certified recycling facility sorting paper, plastic and metal",
-    title: "Get paid, then and there",
-    desc: "Cash or UPI, paid on the spot at the day's rate — plus a printed slip for your records.",
-  },
-];
-
+// Mirrors the live rate card's categories. Prices stay on /market-rates, which reads the API.
 const CATEGORIES = [
   {
-    img: IMAGES.paperWaste,
-    imgAlt: "Bundle of newspapers and cardboard tied with string",
-    label: "Paper & cardboard",
-    desc: "Newspapers, books, boxes, magazines",
-    tag: "Most common",
+    img: "/hero/car.webp",
+    imgAlt: "Old hatchback parked on a quiet street, ready to be scrapped",
+    label: "Vehicles",
+    desc: "Cars, bikes, scooters, autos and e-rickshaws, plus engines, batteries and wheels",
+    tag: "Inspected at your door",
+    tagBg: "bg-(--color-accent)/20 text-(--color-ink)",
+    ring: "hover:border-(--color-accent)",
+  },
+  {
+    img: "/take/kitchen.webp",
+    imgAlt: "Old washing machine, fridge and microwave on a porch",
+    label: "Kitchen & laundry",
+    desc: "Fridges, freezers, washing machines, microwaves, chimneys and RO purifiers",
+    tag: "Priced per piece",
     tagBg: "bg-(--color-bg-deep) text-(--color-primary-dark)",
     ring: "hover:border-(--color-primary-light)",
   },
   {
-    img: IMAGES.plasticWaste,
-    imgAlt: "Bundle of plastic bottles and other waste tied with string",
-    label: "Plastic",
-    desc: "Bottles, containers, packaging material",
-    tag: "Accepted",
+    img: "/take/cooling.webp",
+    imgAlt: "Old window and split AC units and an air cooler against a wall",
+    label: "Cooling & heating",
+    desc: "Window and split ACs, air coolers, geysers and room heaters",
+    tag: "Split or window",
     tagBg: "bg-(--color-primary-light)/15 text-(--color-primary-dark)",
     ring: "hover:border-(--color-primary)",
   },
   {
-    img: IMAGES.eWaste,
-    imgAlt: "Old phones, cables and light bulbs — e-waste collection",
-    label: "E-waste",
-    desc: "Old phones, cables, bulbs, appliances",
-    tag: "Handle with care",
+    img: "/take/office.webp",
+    imgAlt: "Old monitors, CPUs and a printer stacked in a storeroom",
+    label: "TV, computers & office",
+    desc: "TVs, laptops, desktops, monitors, printers, photocopiers and servers",
+    tag: "Homes and offices",
     tagBg: "bg-(--color-accent-soft) text-(--color-ink)",
     ring: "hover:border-(--color-accent)",
   },
-  {
-    img: IMAGES.metalWaste,
-    imgAlt: "Old metal utensils, pipes and scrap iron",
-    label: "Metal & iron",
-    desc: "Old vessels, pipes, tins, scrap iron",
-    tag: "Best value",
-    tagBg: "bg-(--color-accent)/20 text-(--color-ink)",
-    ring: "hover:border-(--color-accent)",
-  },
+];
+
+const MORE_CATEGORIES = [
+  { Icon: BatteryCharging, label: "Power & backup", desc: "Inverters, batteries, UPS, generators, solar panels" },
+  { Icon: Factory, label: "Commercial & industrial", desc: "Kitchen equipment, motors, pumps, gym gear, almirahs" },
+  { Icon: Weight, label: "Metal in bulk", desc: "Copper, brass, aluminium, steel and iron, 25 kg and up" },
 ];
 
 const IMPACT = [
@@ -197,8 +163,8 @@ function WhatWeTake() {
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <Reveal>
           <p className="ss-slip text-xs font-semibold text-(--color-accent) uppercase tracking-[0.18em] mb-3">What we take</p>
-          <h2 className="ss-display text-3xl sm:text-4xl font-semibold tracking-tight text-(--color-ink) mb-2">All kinds of household scrap</h2>
-          <p className="text-(--color-ink-soft) mb-12 text-base">If it's lying around collecting dust, we'll weigh it and pay for it.</p>
+          <h2 className="ss-display text-3xl sm:text-4xl font-semibold tracking-tight text-(--color-ink) mb-2">The big stuff, collected from your door</h2>
+          <p className="text-(--color-ink-soft) mb-12 text-base">If it takes a vehicle to move, we&apos;ll come and get it. Every item has a published rate.</p>
         </Reveal>
 
         <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" stagger={0.09}>
@@ -225,6 +191,29 @@ function WhatWeTake() {
             </StaggerItem>
           ))}
         </StaggerGroup>
+
+        <StaggerGroup className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4" stagger={0.09}>
+          {MORE_CATEGORIES.map(({ Icon, label, desc }) => (
+            <StaggerItem key={label}>
+              <div className="h-full flex items-start gap-4 bg-(--color-bg-card) rounded-xl border border-(--color-line) p-5 shadow-sm">
+                <span className="shrink-0 w-11 h-11 rounded-full bg-(--color-bg-deep) text-(--color-primary) flex items-center justify-center">
+                  <Icon className="w-5 h-5" strokeWidth={2} />
+                </span>
+                <div>
+                  <h4 className="ss-display text-sm font-semibold text-(--color-ink)">{label}</h4>
+                  <p className="text-xs text-(--color-ink-soft) leading-relaxed mt-1">{desc}</p>
+                </div>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerGroup>
+
+        <Reveal className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+          <Link href="/market-rates" className="inline-flex items-center gap-1.5 font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">
+            See every item and today&apos;s rate <IconArrowRight />
+          </Link>
+          <span className="text-(--color-ink-soft)">We no longer collect paper, plastic, glass or small household scrap.</span>
+        </Reveal>
       </div>
     </section>
   );
@@ -384,7 +373,7 @@ function CTAStrip() {
                   {error}
                 </motion.p>
               )}
-              <p className="text-(--color-bg)/70 text-xs mt-4">Free pickup · Fair, weighed rates · Across Dehradun</p>
+              <p className="text-(--color-bg)/70 text-xs mt-4">Free pickup · Published rates · Across Dehradun</p>
             </motion.div>
           )}
         </AnimatePresence>

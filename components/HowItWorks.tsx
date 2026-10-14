@@ -93,7 +93,7 @@ export default function HowItWorks() {
             variants={textItem}
             className="mt-4 sm:mt-6 text-3xl font-semibold tracking-tight text-[var(--color-ink)] md:text-6xl"
           >
-            From your camera
+            From your doorstep
             <br />
             to your wallet.
           </motion.h2>
@@ -102,8 +102,8 @@ export default function HowItWorks() {
             variants={textItem}
             className="mx-auto mt-5 sm:mt-8 max-w-2xl text-base sm:text-lg leading-7 sm:leading-8 text-[var(--color-ink-soft)]"
           >
-            Turn unwanted recyclables into cash in three effortless
-            steps—powered by AI, verified partners, and instant payouts.
+            Sell the big stuff in three simple steps: a published rate,
+            a verified partner at your door, and money in your hand.
           </motion.p>
         </motion.div>
 
@@ -136,20 +136,20 @@ export default function HowItWorks() {
     </div>
 
     <h3 className="max-w-sm text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight text-[var(--color-ink)]">
-      Scan your
+      Tell us what
       <br />
-      scrap
+      you have
     </h3>
 
     <p className="mt-4 lg:mt-6 max-w-lg text-base sm:text-lg leading-7 sm:leading-8 text-[var(--color-ink-soft)]">
-      Point your camera at newspapers, bottles, cardboard, metal,
-      or e-waste. Our AI instantly identifies your recyclables and
-      estimates what they're worth before you schedule a pickup.
+      Pick what you&apos;re selling: a fridge, an AC, a television, a
+      car. See the published rate before you commit, and add a photo
+      so your partner brings the right vehicle.
     </p>
 
     <div className="mt-6 sm:mt-8 lg:mt-10 inline-flex items-center gap-3 rounded-full bg-[var(--color-bg)] px-4 py-2 sm:px-5 sm:py-3 text-xs sm:text-sm font-medium text-[var(--color-primary)]">
 
-      AI-powered detection
+      Published rates, per piece
 
     </div>
 
@@ -166,8 +166,8 @@ export default function HowItWorks() {
     className="relative aspect-[1.15] overflow-hidden rounded-3xl lg:rounded-[60px]"
   >
     <Image
-      src="/scan.png"
-      alt="Person scanning recyclable waste with the Recycler Club app."
+      src="/how-photo.webp"
+      alt="Customer photographing an old fridge and AC for a Recycler Club pickup."
       fill
       priority={false}
       className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -208,8 +208,8 @@ export default function HowItWorks() {
     className="relative w-full aspect-[1.05] overflow-hidden rounded-3xl lg:rounded-[60px]"
   >
     <Image
-      src="/pickup-how.png"
-      alt="Verified Recycler Club partner collecting recyclable materials."
+      src="/hero/appliances.webp"
+      alt="Verified Recycler Club partner wheeling an old fridge to the pickup truck."
       fill
       className="object-cover transition-transform duration-700 hover:scale-105"
     />
@@ -235,8 +235,8 @@ export default function HowItWorks() {
 
     <p className="mt-4 lg:mt-6 max-w-md text-base sm:text-lg leading-7 sm:leading-8 text-[var(--color-ink-soft)]">
       Pick a convenient date and time. A verified Recycler Club
-      partner arrives at your doorstep, weighs your recyclables
-      transparently, and confirms the final value before collection.
+      partner arrives with the right vehicle, checks the condition
+      with you, and confirms the final amount before anything moves.
     </p>
 
     {/* Features */}
@@ -253,7 +253,7 @@ export default function HowItWorks() {
       <div className="flex items-center gap-3">
         <div className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
         <span className="text-sm sm:text-[15px] text-[var(--color-ink-soft)]">
-          Transparent digital weighing
+          The right vehicle for the job
         </span>
       </div>
 
@@ -323,15 +323,15 @@ export default function HowItWorks() {
     </h3>
 
     <p className="mt-4 lg:mt-6 max-w-lg text-base sm:text-lg leading-7 sm:leading-8 text-[var(--color-ink-soft)]">
-      Once your pickup is completed, your earnings are transferred
-      instantly to your Recycler Club wallet. Withdraw them whenever
-      you want with complete transparency.
+      Take cash on the spot, or add it to your Recycler Club wallet
+      and transfer it to your bank whenever you like. Either way,
+      you&apos;re paid before anything leaves your door.
     </p>
 
     <div className="mt-6 sm:mt-8 lg:mt-10 flex flex-wrap gap-2 sm:gap-3">
 
       <span className="rounded-full bg-[var(--color-bg)] px-4 py-2 sm:px-5 sm:py-3 text-xs sm:text-sm font-medium text-[var(--color-primary)]">
-        Instant payout
+        Cash on the spot
       </span>
 
       <span className="rounded-full bg-[var(--color-bg)] px-4 py-2 sm:px-5 sm:py-3 text-xs sm:text-sm font-medium text-[var(--color-primary)]">
@@ -377,7 +377,7 @@ export default function HowItWorks() {
       },
       {
         title: "Fair Pricing",
-        text: "AI estimates and transparent weighing ensure honest payouts.",
+        text: "Published rates, and the final price agreed with you at the door.",
       },
       {
         title: "Instant Payments",
