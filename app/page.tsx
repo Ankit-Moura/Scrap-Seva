@@ -117,7 +117,7 @@ export default function Home() {
                   style={{ originX: 0 }}
                 />
                 <span className="relative z-10 flex items-center gap-2">
-                  Schedule Pickup
+                  Get a free quote
                   <motion.span whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
                     <ArrowRight size={18} />
                   </motion.span>
