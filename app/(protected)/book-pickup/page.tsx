@@ -103,6 +103,98 @@ function QuantityStepper({
   );
 }
 
+/* ---------- Vehicle models: browse by brand ---------- */
+// Categories whose lines are individual makes and models. Shown first, open by
+// default, and browsed brand by brand so car names are visible without typing.
+const VEHICLE_CATEGORIES = ["Cars & SUVs", "Two-wheelers", "Commercial vehicles"];
+
+// Manufacturer as it prefixes the item name -> the brand a customer knows.
+// ponytail: duplicated from the backend's vehicle CSV because the API has no
+// brand field; add one to ScrapItem and read it here if this list drifts.
+const BRAND_PREFIXES: [string, string][] = [
+  ["Maruti Suzuki", "Maruti Suzuki"], ["Mahindra & Mahindra", "Mahindra"], ["Mahindra Reva", "Mahindra"],
+  ["Hyundai", "Hyundai"], ["Tata Motors (Telco)", "Tata"], ["Tata Motors", "Tata"],
+  ["Toyota Kirloskar", "Toyota"], ["DCM Toyota", "Toyota"],
+  ["General Motors (Chevrolet)", "Chevrolet"], ["General Motors (Opel)", "Opel"],
+  ["Honda Motorcycle & Scooter India", "Honda"], ["Honda", "Honda"],
+  ["Hero Honda / Hero MotoCorp", "Hero"], ["Hero Honda", "Hero"], ["Hero MotoCorp", "Hero"], ["Hero Motors", "Hero"],
+  ["Ford India", "Ford"], ["Renault", "Renault"], ["Skoda", "Skoda"], ["Volkswagen", "Volkswagen"],
+  ["Fiat (PAL / Fiat India)", "Fiat"], ["Fiat India", "Fiat"],
+  ["Hindustan Motors (Mitsubishi)", "Hindustan Motors"], ["Hindustan Motors", "Hindustan Motors"],
+  ["Kia India", "Kia"], ["MG Motor India", "MG"], ["Datsun (Nissan)", "Datsun"],
+  ["Allwyn Nissan", "Nissan"], ["Nissan", "Nissan"], ["Citroen", "Citroen"], ["Daewoo", "Daewoo"],
+  ["Bajaj Tempo / Force Motors", "Force"], ["Bajaj Tempo", "Force"], ["Force Motors", "Force"],
+  ["Isuzu", "Isuzu"], ["Jeep (FCA/Stellantis)", "Jeep"], ["Mercedes-Benz India", "Mercedes-Benz"],
+  ["Premier Automobiles", "Premier"], ["Premier", "Premier"], ["Sipani Automobiles", "Sipani"],
+  ["Standard Motor Products", "Standard"], ["Audi India", "Audi"], ["BMW India", "BMW"], ["BYD", "BYD"],
+  ["Peugeot (PAL)", "Peugeot"], ["Tesla", "Tesla"],
+  ["Bajaj Auto (Kawasaki)", "Bajaj"], ["Bajaj Auto", "Bajaj"], ["Royal Enfield", "Royal Enfield"],
+  ["TVS-Suzuki", "TVS"], ["TVS Motor", "TVS"], ["Yamaha India", "Yamaha"], ["Escorts Yamaha", "Yamaha"],
+  ["Escorts", "Escorts"], ["LML", "LML"], ["Ideal Jawa", "Jawa / Yezdi"], ["Classic Legends", "Jawa / Yezdi"],
+  ["Kinetic Engineering", "Kinetic"], ["Kinetic Honda", "Kinetic"], ["Suzuki Motorcycle India", "Suzuki"],
+  ["Ather Energy", "Ather"], ["Ola Electric", "Ola"], ["Revolt", "Revolt"], ["Scooters India", "Scooters India"],
+  ["Ashok Leyland", "Ashok Leyland"], ["Eicher Motors (Mitsubishi)", "Eicher"], ["Piaggio Vehicles", "Piaggio"],
+  ["Swaraj Mazda", "Swaraj Mazda"],
+].sort((a, b) => b[0].length - a[0].length) as [string, string][];
+
+/** "Maruti Suzuki Alto K10" -> { brand: "Maruti Suzuki", model: "Alto K10" } */
+function splitBrand(name: string) {
+  for (const [prefix, brand] of BRAND_PREFIXES) {
+    if (name.startsWith(prefix + " ")) return { brand, model: name.slice(prefix.length + 1) };
+  }
+  return { brand: "Other", model: name };
+}
+
+function orderCategories(categories: ScrapCategory[]) {
+  const rank = (c: ScrapCategory) => {
+    const i = VEHICLE_CATEGORIES.indexOf(c.name);
+    return i === -1 ? VEHICLE_CATEGORIES.length : i;
+  };
+  return [...categories].sort((a, b) => rank(a) - rank(b));
+}
+
+function BrandBrowser({
+  items,
+  renderRow,
+}: {
+  items: ScrapItem[];
+  renderRow: (item: ScrapItem, label?: string) => React.ReactNode;
+}) {
+  const byBrand = useMemo(() => {
+    const map = new Map<string, { item: ScrapItem; model: string }[]>();
+    for (const item of items) {
+      const { brand, model } = splitBrand(item.name);
+      if (!map.has(brand)) map.set(brand, []);
+      map.get(brand)!.push({ item, model });
+    }
+    // Brands with the most models first: Maruti, Mahindra, Hyundai, Tata...
+    return [...map.entries()].sort((a, b) => b[1].length - a[1].length);
+  }, [items]);
+  const [brand, setBrand] = useState(byBrand[0]?.[0] ?? "");
+  const models = byBrand.find(([b]) => b === brand)?.[1] ?? [];
+
+  return (
+    <div className="py-3">
+      <div className="flex flex-wrap gap-2">
+        {byBrand.map(([b, list]) => (
+          <button
+            key={b}
+            onClick={() => setBrand(b)}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              b === brand
+                ? "border-(--color-primary) bg-(--color-primary) text-white"
+                : "border-(--color-line) text-(--color-ink) hover:border-(--color-primary)"
+            }`}
+          >
+            {b} <span className={b === brand ? "text-white/70" : "text-(--color-ink-soft)"}>{list.length}</span>
+          </button>
+        ))}
+      </div>
+      <div className="mt-2">{models.map(({ item, model }) => renderRow(item, model))}</div>
+    </div>
+  );
+}
+
 /* ---------- Step 1: Item picker ---------- */
 function ItemPickerStep({
   categories,
@@ -115,7 +207,8 @@ function ItemPickerStep({
   selected: Record<string, number>;
   setSelected: React.Dispatch<React.SetStateAction<Record<string, number>>>;
 }) {
-  const [openCategory, setOpenCategory] = useState<number | null>(categories[0]?.id ?? null);
+  const ordered = useMemo(() => orderCategories(categories), [categories]);
+  const [openCategory, setOpenCategory] = useState<number | null>(ordered[0]?.id ?? null);
   const [query, setQuery] = useState("");
 
   // Typing searches every category at once: Cars & SUVs alone is 250 lines.
@@ -137,7 +230,7 @@ function ItemPickerStep({
     return map;
   }, [items]);
 
-  const renderRow = (item: ScrapItem) => {
+  const renderRow = (item: ScrapItem, label?: string) => {
     const qty = selected[item.id] || 0;
     return (
                           <div
@@ -145,7 +238,7 @@ function ItemPickerStep({
                             className="flex items-center justify-between gap-3 border-b border-(--color-bg-deep) py-3 last:border-none"
                           >
                             <div className="min-w-0">
-                              <p className="text-sm leading-snug text-(--color-ink)">{item.name}</p>
+                              <p className="text-sm leading-snug text-(--color-ink)">{label ?? item.name}</p>
                               <p className="text-xs text-(--color-ink-soft)">
                                 {priceText(item)}/{item.unit}
                               </p>
@@ -204,7 +297,7 @@ function ItemPickerStep({
       {matches ? (
         <div className="mt-3 rounded-2xl border border-(--color-line) bg-(--color-bg-card) px-4">
           {matches.length ? (
-            matches.slice(0, 60).map(renderRow)
+            matches.slice(0, 60).map((item) => renderRow(item))
           ) : (
             <p className="py-6 text-center text-sm text-(--color-ink-soft)">
               Nothing matches &ldquo;{query}&rdquo;. Try the make or model, or browse below.
@@ -213,7 +306,7 @@ function ItemPickerStep({
         </div>
       ) : (
       <div className="mt-3 space-y-3">
-        {categories.map((cat) => {
+        {ordered.map((cat) => {
           const catItems = itemsByCategory[cat.id] || [];
           const selectedInCat = catItems.filter((i) => selected[i.id] > 0).length;
           const isOpen = openCategory === cat.id;
@@ -253,7 +346,11 @@ function ItemPickerStep({
                     className="overflow-hidden"
                   >
                     <div className="border-t border-(--color-line) px-4">
-                      {catItems.map(renderRow)}
+                      {VEHICLE_CATEGORIES.includes(cat.name) ? (
+                        <BrandBrowser items={catItems} renderRow={renderRow} />
+                      ) : (
+                        catItems.map((item) => renderRow(item))
+                      )}
                     </div>
                   </motion.div>
                 )}
