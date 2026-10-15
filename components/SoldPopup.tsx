@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { BadgeCheck, X } from "lucide-react";
+import sample from "./soldPopupSample.json";
 
 type Sale = { name: string; area: string; item: string; amount: string; ago: string; img: string };
 
@@ -12,14 +12,22 @@ type Sale = { name: string; area: string; item: string; amount: string; ago: str
 // production build. To ship it, replace SAMPLE with a fetch of real completed
 // pickups (first name + initial, area, item, amount, time) and delete the
 // NODE_ENV guard below.
-const SAMPLE: Sale[] = [
-  // Amounts are the live card's rates, so nobody is shown a number we would not pay.
-  { name: "Rohit N.", area: "Rajpur Road", item: "his old SUV", amount: "₹32,000", ago: "2 hours ago", img: "/hero/car.webp" },
-  { name: "Gurpreet S.", area: "Selaqui", item: "a mini truck", amount: "₹40,000", ago: "5 hours ago", img: "/hero/car.webp" },
-  { name: "Priya S.", area: "Prem Nagar", item: "60 kg of copper", amount: "₹33,000", ago: "yesterday", img: "/hero/scrap.webp" },
-  { name: "Arjun T.", area: "Sahastradhara Road", item: "his old sedan", amount: "₹24,000", ago: "yesterday", img: "/hero/car.webp" },
-  { name: "Meena K.", area: "Clement Town", item: "two cassette ACs", amount: "₹12,000", ago: "2 days ago", img: "/take/cooling.webp" },
-];
+const SAMPLE: Sale[] = sample;
+
+/** "Ananya H." -> "AH" */
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+const randomIndex = (not: number) => {
+  // Any entry but the one just shown, so the same sale never appears twice in a row.
+  const i = Math.floor(Math.random() * (SAMPLE.length - 1));
+  return i >= not ? i + 1 : i;
+};
 
 const SHOW_MS = 6000;
 const GAP_MS = 4000;
@@ -39,10 +47,11 @@ export default function SoldPopup() {
     const hide = () => {
       setVisible(false);
       timer = setTimeout(() => {
-        setIndex((i) => (i + 1) % SAMPLE.length);
+        setIndex((i) => randomIndex(i));
         show();
       }, GAP_MS);
     };
+    setIndex(Math.floor(Math.random() * SAMPLE.length));
     timer = setTimeout(show, 3000);
     return () => clearTimeout(timer);
   }, [dismissed]);
@@ -65,8 +74,11 @@ export default function SoldPopup() {
             className="pointer-events-auto relative flex w-[390px] max-w-[calc(100vw-2rem)] items-center gap-4 overflow-hidden rounded-2xl bg-white p-4 pl-5 pr-10 shadow-[0_24px_60px_-12px_rgba(15,81,69,0.55)] ring-1 ring-(--color-primary)/15"
           >
             <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 bg-(--color-accent)" />
-            <span className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl">
-              <Image src={sale.img} alt="" fill sizes="72px" className="object-cover" />
+            <span
+              aria-hidden
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-lg font-semibold text-white"
+            >
+              {initials(sale.name)}
             </span>
             <div className="min-w-0 text-[15px] leading-snug">
               <p className="text-(--color-ink)">
