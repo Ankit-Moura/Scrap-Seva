@@ -47,7 +47,7 @@ export default function SoldPopup() {
     return () => clearTimeout(timer);
   }, [dismissed]);
 
-  if (process.env.NODE_ENV === "production") return null;
+  // if (process.env.NODE_ENV === "production") return null;
 
   const sale = SAMPLE[index];
 
