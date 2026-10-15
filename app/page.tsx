@@ -6,6 +6,7 @@ import Image from "next/image";
 import HowItWorks from "@/components/HowItWorks";
 import Link from "next/link";
 import HomePage from "@/components/HomePage";
+import SoldPopup from "@/components/SoldPopup";
 
 // Each tile gets its own wobbly outline and tilt so the collage reads hand-placed.
 const TILES = [
@@ -181,6 +182,7 @@ export default function Home() {
       </section>
       <HowItWorks/>
       <HomePage/>
+      <SoldPopup/>
     </>
   );
 }
