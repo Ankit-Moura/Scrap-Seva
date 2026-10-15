@@ -22,7 +22,9 @@ interface ScrapItem {
   name: string;
   unit: string;
   base_rate: string;
+  max_rate: string | null;
   category: number;
+  category_name?: string;
 }
 interface AddressItem {
   id: string;
@@ -62,6 +64,12 @@ function nextDays(n: number) {
 }
 function formatMoney(n: number) {
   return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+}
+/** "₹33,600 – ₹43,000" for a vehicle model, "₹550" for everything else. The
+ * low end is what totals use: it is what we pay at least. */
+function priceText(item: ScrapItem, quantity = 1) {
+  const low = `₹${formatMoney(quantity * parseFloat(item.base_rate))}`;
+  return item.max_rate ? `${low} – ₹${formatMoney(quantity * parseFloat(item.max_rate))}` : low;
 }
 
 function QuantityStepper({
@@ -108,6 +116,17 @@ function ItemPickerStep({
   setSelected: React.Dispatch<React.SetStateAction<Record<string, number>>>;
 }) {
   const [openCategory, setOpenCategory] = useState<number | null>(categories[0]?.id ?? null);
+  const [query, setQuery] = useState("");
+
+  // Typing searches every category at once: Cars & SUVs alone is 250 lines.
+  const matches = useMemo(() => {
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return null;
+    return items.filter((i) => {
+      const name = i.name.toLowerCase();
+      return words.every((w) => name.includes(w));
+    });
+  }, [items, query]);
 
   const itemsByCategory = useMemo(() => {
     const map: Record<number, ScrapItem[]> = {};
@@ -118,6 +137,50 @@ function ItemPickerStep({
     return map;
   }, [items]);
 
+  const renderRow = (item: ScrapItem) => {
+    const qty = selected[item.id] || 0;
+    return (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between gap-3 border-b border-(--color-bg-deep) py-3 last:border-none"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm leading-snug text-(--color-ink)">{item.name}</p>
+                              <p className="text-xs text-(--color-ink-soft)">
+                                {priceText(item)}/{item.unit}
+                              </p>
+                            </div>
+
+                            {qty > 0 ? (
+                              <QuantityStepper
+                                value={qty}
+                                unit={item.unit}
+                                onChange={(v) =>
+                                  setSelected((prev) => {
+                                    const next = { ...prev };
+                                    if (v <= 0) delete next[item.id];
+                                    else next[item.id] = v;
+                                    return next;
+                                  })
+                                }
+                              />
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  setSelected((prev) => ({
+                                    ...prev,
+                                    [item.id]: item.unit === "kg" ? 1 : 1,
+                                  }))
+                                }
+                                className="rounded-full border border-(--color-accent) px-3 py-1.5 text-xs font-medium text-(--color-accent) hover:bg-(--color-accent)/10"
+                              >
+                                Add
+                              </button>
+                            )}
+                          </div>
+    );
+  };
+
   return (
     <div>
       <h1 className="font-serif text-[26px] leading-tight text-(--color-ink)">
@@ -127,7 +190,29 @@ function ItemPickerStep({
         Pick what you have — we'll show you what it's worth as you go.
       </p>
 
-      <div className="mt-6 space-y-3">
+      <div className="relative mt-6">
+        <Icons.Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-ink-soft)" />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search — e.g. Swift, Activa, split AC"
+          className="w-full rounded-2xl border border-(--color-line) bg-(--color-bg-card) py-3 pl-10 pr-4 text-sm text-(--color-ink) outline-none placeholder:text-(--color-ink-soft)/70 focus:border-(--color-primary)"
+        />
+      </div>
+
+      {matches ? (
+        <div className="mt-3 rounded-2xl border border-(--color-line) bg-(--color-bg-card) px-4">
+          {matches.length ? (
+            matches.slice(0, 60).map(renderRow)
+          ) : (
+            <p className="py-6 text-center text-sm text-(--color-ink-soft)">
+              Nothing matches &ldquo;{query}&rdquo;. Try the make or model, or browse below.
+            </p>
+          )}
+        </div>
+      ) : (
+      <div className="mt-3 space-y-3">
         {categories.map((cat) => {
           const catItems = itemsByCategory[cat.id] || [];
           const selectedInCat = catItems.filter((i) => selected[i.id] > 0).length;
@@ -168,49 +253,7 @@ function ItemPickerStep({
                     className="overflow-hidden"
                   >
                     <div className="border-t border-(--color-line) px-4">
-                      {catItems.map((item) => {
-                        const qty = selected[item.id] || 0;
-                        return (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between gap-3 border-b border-(--color-bg-deep) py-3 last:border-none"
-                          >
-                            <div className="min-w-0">
-                              <p className="truncate text-sm text-(--color-ink)">{item.name}</p>
-                              <p className="text-xs text-(--color-ink-soft)">
-                                ₹{item.base_rate}/{item.unit}
-                              </p>
-                            </div>
-
-                            {qty > 0 ? (
-                              <QuantityStepper
-                                value={qty}
-                                unit={item.unit}
-                                onChange={(v) =>
-                                  setSelected((prev) => {
-                                    const next = { ...prev };
-                                    if (v <= 0) delete next[item.id];
-                                    else next[item.id] = v;
-                                    return next;
-                                  })
-                                }
-                              />
-                            ) : (
-                              <button
-                                onClick={() =>
-                                  setSelected((prev) => ({
-                                    ...prev,
-                                    [item.id]: item.unit === "kg" ? 1 : 1,
-                                  }))
-                                }
-                                className="rounded-full border border-(--color-accent) px-3 py-1.5 text-xs font-medium text-(--color-accent) hover:bg-(--color-accent)/10"
-                              >
-                                Add
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })}
+                      {catItems.map(renderRow)}
                     </div>
                   </motion.div>
                 )}
@@ -219,6 +262,7 @@ function ItemPickerStep({
           );
         })}
       </div>
+      )}
     </div>
   );
 }
@@ -237,7 +281,7 @@ function ReviewStep({
         Here's what you'll get
       </h1>
       <p className="mt-1.5 text-sm text-(--color-ink-soft)">
-        A rough estimate — final weight is confirmed at pickup.
+        A starting estimate — the final amount is agreed with you at pickup.
       </p>
 
       <div className="mt-6 rounded-2xl border border-(--color-line) bg-(--color-bg-card) px-4">
@@ -249,12 +293,12 @@ function ReviewStep({
             <div>
               <p className="text-sm text-(--color-ink)">{item.name}</p>
               <p className="text-xs text-(--color-ink-soft)">
-                {quantity} {item.unit} × ₹{item.base_rate}
+                {quantity} {item.unit} × {priceText(item)}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <span className="font-serif text-[15px] text-(--color-ink)">
-                ₹{formatMoney(quantity * parseFloat(item.base_rate))}
+                {priceText(item, quantity)}
               </span>
               <button onClick={() => onRemove(item.id)} className="text-(--color-accent) hover:text-red-500">
                 <Icons.X className="h-4 w-4" />

@@ -22,6 +22,7 @@ interface ScrapItem {
   name: string;
   unit: string;
   base_rate: string;
+  max_rate: string | null;
   description: string | null;
   is_active: boolean;
   created_at: string;
@@ -48,8 +49,11 @@ function getLucideIcon(name: string | null) {
 /* ---------- Animated counter ---------- */
 function RateCount({ value }: { value: number }) {
   const mv = useMotionValue(0);
-  const rounded = useTransform(mv, (v) => v.toFixed(2));
-  const [display, setDisplay] = useState("0.00");
+  // 33,600 not 33600.00: whole rupees lose the paise, and lakhs get grouped.
+  const format = (v: number) =>
+    v.toLocaleString("en-IN", { maximumFractionDigits: Number.isInteger(value) ? 0 : 2 });
+  const rounded = useTransform(mv, format);
+  const [display, setDisplay] = useState("0");
 
   useEffect(() => {
     const controls = animate(mv, value, { duration: 0.7, ease: [0.22, 1, 0.36, 1] });
@@ -68,6 +72,7 @@ function RateCount({ value }: { value: number }) {
 function RateCard({ item, iconName, index }: { item: ScrapItem; iconName: string | null; index: number }) {
   const Icon = getLucideIcon(iconName);
   const rate = parseFloat(item.base_rate);
+  const max = item.max_rate ? parseFloat(item.max_rate) : null;
 
   return (
     <motion.div
@@ -92,6 +97,11 @@ function RateCard({ item, iconName, index }: { item: ScrapItem; iconName: string
 
       <p className="mt-0.5 shrink-0 whitespace-nowrap font-serif text-lg tabular-nums text-[#2B2B24] sm:text-xl">
         ₹<RateCount value={isNaN(rate) ? 0 : rate} />
+        {max !== null && !isNaN(max) && (
+          <span className="block text-right text-sm text-[#8A8375] sm:text-base">
+            to ₹<RateCount value={max} />
+          </span>
+        )}
       </p>
     </motion.div>
   );
